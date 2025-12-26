@@ -78,6 +78,7 @@ class _SignInState extends State<SignIn> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      // appBar: AppBar(),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -117,6 +118,7 @@ class _SignInState extends State<SignIn> {
 
               // Email field
               _buildTextField(
+                inputType: TextInputType.emailAddress,
                 controller: _emailController,
                 hint: 'abc@email.com',
                 icon: Iconsax.message,
@@ -125,6 +127,7 @@ class _SignInState extends State<SignIn> {
 
               // Password field
               _buildTextField(
+                inputType: TextInputType.visiblePassword,
                 controller: _passwordController,
                 hint: 'Your password',
                 icon: Iconsax.lock,
@@ -275,6 +278,7 @@ class _SignInState extends State<SignIn> {
   }
 
   Widget _buildTextField({
+    required TextInputType inputType,
     required TextEditingController controller,
     required String hint,
     required IconData icon,
@@ -282,6 +286,7 @@ class _SignInState extends State<SignIn> {
     IconData? suffixIcon,
   }) {
     return TextField(
+      keyboardType: inputType,
       controller: controller,
       obscureText: obscureText,
       decoration: InputDecoration(

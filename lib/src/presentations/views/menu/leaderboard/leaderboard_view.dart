@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:green_globe/src/const/custom_style.dart';
-import 'package:green_globe/src/presentations/views/menu/widgets/rank_widget.dart';
+import 'package:green_globe/src/presentations/views/menu/leaderboard/rank_widget.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LeaderboardView extends StatefulWidget {

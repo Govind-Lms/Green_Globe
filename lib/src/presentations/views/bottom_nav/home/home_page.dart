@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:green_globe/src/const/constant.dart';
 import 'package:green_globe/src/const/custom_style.dart';
+import 'package:green_globe/src/core/auth.dart';
 import 'package:green_globe/src/models/category_model.dart';
 import 'package:green_globe/src/models/eco_model.dart';
 import 'package:green_globe/src/presentations/views/bottom_nav/home/eco_friendly_tips/eco_friendly_view.dart';
@@ -24,6 +25,7 @@ import 'package:green_globe/src/presentations/views/bottom_nav/home/how_to_recyc
 import 'package:green_globe/src/presentations/views/bottom_nav/home/how_to_recycle/recycle_views/tyre_view.dart';
 import 'package:green_globe/src/presentations/widgets/custom_app_bar.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:shimmer/shimmer.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -165,6 +167,32 @@ class HomePage extends StatelessWidget {
 }
 
 class _PointsCard extends StatelessWidget {
+  const _PointsCard();
+
+  Future<Map<String, dynamic>?> _fetchUserStats(BuildContext context) async {
+    try {
+      await Future.delayed(const Duration(milliseconds: 800));
+      final user = AuthService.getCurrentUser();
+      if (user == null) {
+        return <String, dynamic>{
+          'smart_bins_nearby': "?",
+          'bins_notified': "?",
+          'points_used': "?",
+        };
+      } else {
+        // Dummy values if signed in
+        return <String, dynamic>{
+          'smart_bins_nearby': "6",
+          'bins_notified': "3",
+          'points_used': "211",
+        };
+      }
+    } catch (e) {
+      // Handle or log the error as needed
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -199,7 +227,7 @@ class _PointsCard extends StatelessWidget {
               const Icon(Icons.remove_red_eye, color: Colors.white, size: 18),
             ],
           ),
-          SizedBox(height: 18),
+          const SizedBox(height: 18),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -209,24 +237,131 @@ class _PointsCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 18),
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _Stat(label: 'Smart\nBins Nearby', value: '145'),
-                Container(width: 1, height: 36, color: Colors.grey.shade300),
-                _Stat(label: "Bins\nYou've Notified", value: '122'),
-                Container(width: 1, height: 36, color: Colors.grey.shade300),
-                _Stat(label: 'Points\nUsed', value: '1,232'),
-              ],
-            ),
+          FutureBuilder<Map<String, dynamic>?>(
+            future: _fetchUserStats(
+              context,
+            ), // fetches stats or null if not signed in
+            builder: (context, snapshot) {
+              final isLoading =
+                  snapshot.connectionState == ConnectionState.waiting;
+              final hasData = snapshot.hasData && snapshot.data != null;
+
+              String smartBinsNearby = '?';
+              String binsNotified = '?';
+              String pointsUsed = '?';
+
+              if (hasData) {
+                final stats = snapshot.data!;
+                smartBinsNearby = (stats['smart_bins_nearby'] ?? '?')
+                    .toString();
+                binsNotified = (stats['bins_notified'] ?? '?').toString();
+                pointsUsed = (stats['points_used'] ?? '?').toString();
+              }
+
+              return Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 14,
+                  horizontal: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: isLoading
+                    // FIX: Provide the missing _ShimmerStat widget
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6.0,
+                              ),
+                              child: _ShimmerStat(),
+                            ),
+                          ),
+                          Container(
+                            width: 1,
+                            height: 36,
+                            color: Colors.grey.shade200,
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6.0,
+                              ),
+                              child: _ShimmerStat(),
+                            ),
+                          ),
+                          Container(
+                            width: 1,
+                            height: 36,
+                            color: Colors.grey.shade200,
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6.0,
+                              ),
+                              child: _ShimmerStat(),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _Stat(
+                            label: 'Smart\nBins Nearby',
+                            value: smartBinsNearby,
+                          ),
+                          Container(
+                            width: 1,
+                            height: 36,
+                            color: Colors.grey.shade300,
+                          ),
+                          _Stat(
+                            label: "Bins\nYou've Notified",
+                            value: binsNotified,
+                          ),
+                          Container(
+                            width: 1,
+                            height: 36,
+                            color: Colors.grey.shade300,
+                          ),
+                          _Stat(label: 'Points\nUsed', value: pointsUsed),
+                        ],
+                      ),
+              );
+            },
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ShimmerStat extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer(
+      gradient: LinearGradient(
+        colors: [
+          Colors.grey.shade300,
+          Colors.grey.shade100,
+          Colors.grey.shade300,
+        ],
+        stops: [0.1, 0.5, 0.9],
+        begin: Alignment.centerLeft,
+        end: Alignment.centerRight,
+      ),
+
+      child: Container(
+        height: kToolbarHeight,
+        decoration: BoxDecoration(
+          color: Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(8),
+        ),
       ),
     );
   }

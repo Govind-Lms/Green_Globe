@@ -13,47 +13,27 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
+  // final bool _isLoading = true;
 
-class _MyAppState extends State<MyApp> {
-  bool _isLoading = true;
-  bool _isSignedIn = false;
-
-  @override
-  void initState() {
-    super.initState();
-    checkSignInStatus();
-  }
-
-  Future<void> checkSignInStatus() async {
-    // Check if the user is signed in
-    final isSignedIn = AuthService.isSignedIn();
-    setState(() {
-      _isSignedIn = isSignedIn;
-      _isLoading = false;
-    });
-  }
-
+  // bool _isSignedIn = false;
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      // Optionally show a loading indicator
-      return const MaterialApp(
-        home: Scaffold(body: Center(child: CircularProgressIndicator())),
-      );
-    }
+    // if (_isLoading) {
+    //   // Optionally show a loading indicator
+    //   return const MaterialApp(
+    //     home: Scaffold(body: Center(child: CircularProgressIndicator())),
+    //   );
+    // }
     return MaterialApp(
       title: 'Green Globe',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF5EA560)),
       ),
-      home: _isSignedIn ? const BottomNav() : const SignIn(),
+      home: BottomNav(),
     );
   }
 }

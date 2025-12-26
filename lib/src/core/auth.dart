@@ -46,14 +46,20 @@ class AuthService {
         final randomProfilePictureUrl =
             profilePictureUrls[random.nextInt(profilePictureUrls.length)];
 
-        // Insert into users table
-        await _client.from('users').insert({
-          'user_id': userId,
-          'email': userEmail,
-          'profile_picture_url': randomProfilePictureUrl,
-          'points': 0,
-          'points_history': [],
-        });
+        try {
+          // Insert into users table
+          await _client.from('users').insert({
+            'user_id': userId,
+            'email': userEmail,
+            'profile_picture_url': randomProfilePictureUrl,
+            'points': 0,
+            'points_history': [],
+          });
+        } on PostgrestException catch (e) {
+          // Clean up the user on Supabase Auth if user record insertion failed
+          await _client.auth.admin.deleteUser(userId);
+          throw Exception('Failed to create user record: ${e.message}');
+        }
       }
 
       return response;
@@ -67,10 +73,37 @@ class AuthService {
     }
   }
 
-  /// Sign out the current user
-  ///
-  /// Returns void on success
-  /// Throws [AuthException] if sign out fails
+  static Future<void> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    try {
+      final session = _client.auth.currentSession;
+      if (session == null) {
+        throw AuthException('User is not signed in.');
+      }
+      final email = session.user.email;
+      if (email == null || email.isEmpty) {
+        throw AuthException('Failed to retrieve current email address.');
+      }
+
+      // Attempt sign-in for password validation (will throw on error)
+      await _client.auth.signInWithPassword(
+        email: email,
+        password: oldPassword,
+      );
+
+      // Change the password
+      await _client.auth.updateUser(UserAttributes(password: newPassword));
+    } on AuthException catch (e) {
+      throw AuthException(e.message, statusCode: e.statusCode);
+    } catch (e) {
+      throw Exception(
+        'An unexpected error occurred while changing password: $e',
+      );
+    }
+  }
+
   static Future<void> signOut() async {
     try {
       await _client.auth.signOut();
@@ -78,6 +111,33 @@ class AuthService {
       throw AuthException(e.message, statusCode: e.statusCode);
     } catch (e) {
       throw Exception('An unexpected error occurred during sign out: $e');
+    }
+  }
+
+  
+  static Future<void> deleteAccount({String? password}) async {
+    try {
+      final user = _client.auth.currentUser;
+      if (user == null) {
+        throw AuthException('User is not signed in.');
+      }
+
+      // Re-authenticate user by signing in again if password is provided.
+      if (password != null && user.email != null) {
+        await _client.auth.signInWithPassword(
+          email: user.email!,
+          password: password,
+        );
+      }
+
+      
+      await _client.auth.admin.deleteUser(user.id);
+    } on AuthException catch (e) {
+      throw AuthException(e.message, statusCode: e.statusCode);
+    } catch (e) {
+      throw Exception(
+        'An unexpected error occurred while deleting account: $e',
+      );
     }
   }
 
