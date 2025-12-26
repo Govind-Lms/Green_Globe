@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:green_globe/src/core/supabase_config.dart';
 import 'package:green_globe/src/presentations/views/auth/sign_in.dart';
 import 'package:green_globe/src/core/auth.dart';
-import 'package:green_globe/src/presentations/views/bottom_nav/home/home_page.dart';
 import 'package:green_globe/src/presentations/views/bottom_nav/nav.dart';
 
 void main() async {
