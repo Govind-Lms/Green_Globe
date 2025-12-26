@@ -5,7 +5,6 @@ import 'package:green_globe/src/const/custom_style.dart';
 import 'package:green_globe/src/core/auth.dart';
 import 'package:green_globe/src/presentations/views/auth/change_password.dart';
 import 'package:green_globe/src/presentations/views/auth/sign_in.dart';
-import 'package:green_globe/src/presentations/views/bottom_nav/home/home_page.dart';
 import 'package:green_globe/src/presentations/views/bottom_nav/nav.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
