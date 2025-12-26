@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:green_globe/src/const/constant.dart';
 import 'package:green_globe/src/const/custom_style.dart';
-import 'package:green_globe/src/presentations/views/menu/events/event_details.dart';
 import 'package:green_globe/src/presentations/views/menu/events/events.dart';
 import 'package:green_globe/src/presentations/views/menu/events/past_event.dart';
 import 'package:lottie/lottie.dart';
