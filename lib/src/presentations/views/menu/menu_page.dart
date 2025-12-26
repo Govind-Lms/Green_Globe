@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:green_globe/src/const/constant.dart';
 import 'package:green_globe/src/const/custom_style.dart';
-import 'package:green_globe/src/core/auth.dart';
-import 'package:green_globe/src/presentations/views/auth/sign_in.dart';
-import 'package:iconsax/iconsax.dart';
+import 'package:green_globe/src/presentations/views/menu/leaderboard_view.dart';
 
 class MenuPage extends StatelessWidget {
   const MenuPage({super.key});
@@ -81,7 +79,11 @@ class MenuPage extends StatelessWidget {
                     _MenuItem(
                       icon: Icons.insert_drive_file_outlined,
                       label: 'Leaderboard',
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const LeaderboardView()),
+                        );
+                      },
                     ),
                     SizedBox(height: 24),
                     _MenuItem(
