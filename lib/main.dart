@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:green_globe/src/const/constant.dart';
 import 'package:green_globe/src/core/supabase_config.dart';
 import 'package:green_globe/src/presentations/views/bottom_nav/nav.dart';
 
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
       title: 'Green Globe',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF5EA560)),
+        colorScheme: ColorScheme.fromSeed(seedColor: primaryGreen),
       ),
       home: BottomNav(),
     );

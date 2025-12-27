@@ -1,61 +1,76 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:flutter/material.dart';
-
 class EcoModel {
   final String title;
   final String shortDesc;
-  final IconData icon;
+  final String image;
+  final String icon;
   EcoModel({
     required this.title,
     required this.shortDesc,
-    this.icon = Icons.delete,
+    required this.image,
+    required this.icon,
   });
 }
 
 List<EcoModel> ecoLists = [
   EcoModel(
+    icon: "assets/icons/Icons/tree.png",
+    image: "assets/icons/tree_tip.png",
     title: "Plant a Tree",
     shortDesc:
         "Trees improve air quality and support biodiversity—plant one whenever you can.",
     // icon: "tree",
   ),
   EcoModel(
+    icon: "assets/icons/Icons/online-shopping.png",
+    image: "assets/icons/reusable_bag.png",
     title: "Use Reusable Bags",
     shortDesc:
         "Carry cloth or reusable bags to reduce plastic waste during shopping.",
     // icon: "online-shopping",
   ),
   EcoModel(
+    icon: "assets/icons/Icons/water-tap.png",
+    image: "assets/icons/water.png",
     title: "Save Water Daily",
     shortDesc:
         "Turn off the tap while brushing and fix leaks to conserve water and lower water bills.",
     // icon: "water-tap",
   ),
   EcoModel(
+    icon: "assets/icons/Icons/fast-food.png",
+    image: "assets/icons/food_waste.png",
     title: "Reduce Food Waste",
     shortDesc:
         "Plan meals, store food properly, and compost leftovers to minimize waste.",
     // icon: "fast-food",
   ),
   EcoModel(
+    icon: "assets/icons/Icons/recycle-symbol.png",
+    image: "assets/icons/recycle_bin.png",
     title: "Reuse Before Replacing",
     shortDesc:
         "Reuse jars, bottles, and containers instead of throwing them away.",
     // icon: "recycle-symbol",
   ),
   EcoModel(
+    icon: "assets/icons/Icons/man.png",
+    image: "assets/icons/walking.png",
     title: "Choose Eco Transport",
     shortDesc:
         "Walk, cycle, or use public transport to reduce air pollution and carbon emissions.",
     // icon: "man",
   ),
   EcoModel(
+    icon: "assets/icons/Icons/power-plug.png",
+    image: "assets/icons/unplug.png",
     title: "Unplug Devices",
     shortDesc:
         "Unplug chargers and devices when not in use to prevent energy loss.",
     // icon: "power-plug",
   ),
   EcoModel(
+    icon: "assets/icons/Icons/soap.png",
+    image: "assets/icons/eco_soap.png",
     title: "Use Eco-Friendly Products",
     shortDesc:
         "Choose biodegradable or natural cleaning products to protect the environment.",

@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 
-const primaryGreen = Color(0xFF5EA560);
-const secondaryGreen = Color(0xff98C586);
+const primaryGreen = Color(0xFF40A857);
+const secondaryGreen = Color(0xff8BC87F);
 const accentGreen = Color(0xffDCEED8);
+
+List<String> barcodeLists = [
+  "ID:BIN_UCSMDY001_RECYCLABLES\n21.790834, 96.116327",
+  "ID:BIN_UCSMDY002_BIODEGRADABLE\n21.790835, 96.116328",
+  "ID:BIN_UCSMDY003_NONRECYCLABLE\n21.790836, 96.116329",
+  "ID:BIN_UCSMDY004_HAZARDOUS\n21.790837, 96.116330",
+  "ID:BIN_UCSMDY005_EWASTE\n21.790838, 96.116331",
+];
 
 var profilePictureUrls = [
   "https://lmjcaqkomyviuyecqush.supabase.co/storage/v1/object/public/profile_pictures/profie_pic_01.jpg",

@@ -10,11 +10,11 @@ class MenuPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: primaryGreen,
-      body: SafeArea(
-        child: Swipe(
-          onSwipeLeft: () => Navigator.pop(context),
+    return Swipe(
+      onSwipeLeft: () => Navigator.pop(context),
+      child: Scaffold(
+        backgroundColor: primaryGreen,
+        body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             child: Column(

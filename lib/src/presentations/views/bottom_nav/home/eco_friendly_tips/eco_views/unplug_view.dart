@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:green_globe/src/const/custom_style.dart';
+import 'package:green_globe/src/models/eco_model.dart';
+import 'package:green_globe/src/presentations/views/bottom_nav/home/eco_friendly_tips/eco_image_widget.dart';
 import 'package:green_globe/src/presentations/views/bottom_nav/home/widgets/bullet_point.dart';
-import 'package:green_globe/src/presentations/views/bottom_nav/home/widgets/image_builder.dart';
 import 'package:green_globe/src/presentations/views/bottom_nav/home/widgets/title_builder.dart';
 
 class UnplugDetailsView extends StatelessWidget {
-  const UnplugDetailsView({super.key});
+  final EcoModel ecoModel;
+  const UnplugDetailsView({super.key, required this.ecoModel});
 
   @override
   Widget build(BuildContext context) {
@@ -22,10 +24,10 @@ class UnplugDetailsView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 10),
-            ImageBuilder(
-              context: context,
-              image: 'assets/icons/plastics1.jpeg',
-              text: "",
+            EcoImageBuilder(
+              image: ecoModel.image,
+              text: ecoModel.title,
+              shortDesc: ecoModel.shortDesc,
             ),
 
             TitleBuilder(title: 'Benefits of Unplugging'),

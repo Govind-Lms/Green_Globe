@@ -23,9 +23,11 @@ import 'package:green_globe/src/presentations/views/bottom_nav/home/how_to_recyc
 import 'package:green_globe/src/presentations/views/bottom_nav/home/how_to_recycle/recycle_views/organic_view.dart';
 import 'package:green_globe/src/presentations/views/bottom_nav/home/how_to_recycle/recycle_views/plastic_view.dart';
 import 'package:green_globe/src/presentations/views/bottom_nav/home/how_to_recycle/recycle_views/tyre_view.dart';
+import 'package:green_globe/src/presentations/views/menu/auctions/auction_page.dart';
 import 'package:green_globe/src/presentations/widgets/custom_app_bar.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -44,7 +46,7 @@ class HomePage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 12),
-                  _PointsCard(),
+                  const _PointsCard(),
                   const SizedBox(height: 24),
                   _SectionHeader(
                     title: 'HOW TO RECYCLE?',
@@ -72,7 +74,7 @@ class HomePage extends StatelessWidget {
                     (index) => Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(16),
-                      margin: EdgeInsets.symmetric(vertical: 10),
+                      margin: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(18),
@@ -92,16 +94,16 @@ class HomePage extends StatelessWidget {
                       child: InkWell(
                         onTap: () {
                           final pages = [
-                            PlantATreeDetailsView(),
-                            ReusableBagsDetailsView(),
-                            SaveWaterDetailsView(),
-                            FoodWasteDetailsView(),
-                            ReuseBeforeDetailsView(),
-                            EcoTransportDetailsView(),
-                            UnplugDetailsView(),
-                            EcoProductDetailsView(),
+                            PlantATreeDetailsView(ecoModel: ecoLists[index]),
+                            ReusableBagsDetailsView(ecoModel: ecoLists[index]),
+                            SaveWaterDetailsView(ecoModel: ecoLists[index]),
+                            FoodWasteDetailsView(ecoModel: ecoLists[index]),
+                            ReuseBeforeDetailsView(ecoModel: ecoLists[index]),
+                            EcoTransportDetailsView(ecoModel: ecoLists[index]),
+                            UnplugDetailsView(ecoModel: ecoLists[index]),
+                            EcoProductDetailsView(ecoModel: ecoLists[index]),
                           ];
-
+                          // Defensive: avoid out-of-bounds
                           if (index < pages.length) {
                             Navigator.push(
                               context,
@@ -138,17 +140,13 @@ class HomePage extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 12),
-                            Container(
+                            SizedBox(
                               height: 100,
-                              width: 80,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFE8F7EE),
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                              child: Icon(
+                              width: 60,
+                              child: Image.asset(
                                 ecoLists[index].icon,
-                                color: primaryGreen,
-                                size: 28,
+                                height: 40,
+                                fit: BoxFit.scaleDown,
                               ),
                             ),
                           ],
@@ -166,8 +164,24 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class _PointsCard extends StatelessWidget {
+class _PointsCard extends StatefulWidget {
   const _PointsCard();
+
+  @override
+  State<_PointsCard> createState() => _PointsCardState();
+}
+
+class _PointsCardState extends State<_PointsCard> {
+  bool _pointsVisible = true;
+
+  // Cache the user stats for cleaner toggling UI
+  Future<Map<String, dynamic>?>? _userStatsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _userStatsFuture = _fetchUserStats(context);
+  }
 
   Future<Map<String, dynamic>?> _fetchUserStats(BuildContext context) async {
     try {
@@ -175,21 +189,47 @@ class _PointsCard extends StatelessWidget {
       final user = AuthService.getCurrentUser();
       if (user == null) {
         return <String, dynamic>{
-          'smart_bins_nearby': "?",
-          'bins_notified': "?",
-          'points_used': "?",
+          'smart_bins_nearby': "-",
+          'bins_notified': "-",
+          'points_used': "-",
+          'points_history': [],
         };
       } else {
-        // Dummy values if signed in
+        final client = Supabase.instance.client;
+        final userEmail = user.email;
+        final userData = await client
+            .from('users')
+            .select('points_history')
+            .eq('email', userEmail!)
+            .maybeSingle(); // Use maybeSingle to avoid crash when not found
+        final pointHistory = (userData?['points_history'] as List?) ?? [];
+        final binsNearby = barcodeLists.length;
         return <String, dynamic>{
-          'smart_bins_nearby': "6",
-          'bins_notified': "3",
-          'points_used': "211",
+          'smart_bins_nearby': "$binsNearby",
+          'bins_notified': "${pointHistory.length}",
+          'points_used': "0",
+          'points_history': pointHistory,
         };
       }
-    } catch (e) {
-      // Handle or log the error as needed
-      return null;
+    } catch (e, stackTrace) {
+      debugPrint('Error in _fetchUserStats: $e\n$stackTrace');
+      // Don't show snackbar if context is not mounted
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              'Failed to fetch user stats. Please try again.',
+            ),
+            backgroundColor: Colors.red[400],
+          ),
+        );
+      }
+      return <String, dynamic>{
+        'smart_bins_nearby': "-",
+        'bins_notified': "-",
+        'points_used': "-",
+        'points_history': [],
+      };
     }
   }
 
@@ -215,32 +255,83 @@ class _PointsCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                '211 Points',
-                style: CustomStyle.twenty.copyWith(
-                  fontSize: 22,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                ),
+              FutureBuilder<Map<String, dynamic>?>(
+                future: _userStatsFuture,
+                builder: (context, snapshot) {
+                  int totalPoints = 0;
+                  final userData = snapshot.data;
+                  if (userData != null && userData['points_history'] is List) {
+                    for (final entry in userData['points_history']) {
+                      if (entry is Map && entry['points_earned'] != null) {
+                        final earned = entry['points_earned'];
+                        try {
+                          totalPoints += earned is int
+                              ? earned
+                              : int.tryParse(earned.toString()) ?? 0;
+                        } catch (_) {}
+                      }
+                    }
+                  }
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _pointsVisible ? '$totalPoints Points' : '••••••',
+                        style: CustomStyle.twenty.copyWith(
+                          fontSize: 22,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _pointsVisible = !_pointsVisible;
+                          });
+                        },
+                        child: Icon(
+                          _pointsVisible
+                              ? Icons.remove_red_eye
+                              : Icons.visibility_off,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
-              const SizedBox(width: 8),
-              const Icon(Icons.remove_red_eye, color: Colors.white, size: 18),
             ],
           ),
           const SizedBox(height: 18),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _Shortcut(icon: Icons.delete_outline, label: 'Smart Bin'),
-              _Shortcut(icon: Icons.gavel_outlined, label: 'Auctions'),
-              _Shortcut(icon: Iconsax.medal_star5, label: 'Points'),
+              _Shortcut(
+                icon: Icons.delete_outline,
+                label: 'Smart Bin',
+                onTap: () {},
+              ),
+              _Shortcut(
+                icon: Icons.gavel_outlined,
+                label: 'Auctions',
+                onTap: () {
+                  Navigator.of(
+                    context,
+                  ).push(MaterialPageRoute(builder: (_) => AuctionPage()));
+                },
+              ),
+              _Shortcut(
+                icon: Iconsax.medal_star5,
+                label: 'Points',
+                onTap: () {},
+              ),
             ],
           ),
           const SizedBox(height: 18),
           FutureBuilder<Map<String, dynamic>?>(
-            future: _fetchUserStats(
-              context,
-            ), // fetches stats or null if not signed in
+            future: _userStatsFuture,
             builder: (context, snapshot) {
               final isLoading =
                   snapshot.connectionState == ConnectionState.waiting;
@@ -268,7 +359,6 @@ class _PointsCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: isLoading
-                    // FIX: Provide the missing _ShimmerStat widget
                     ? Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -277,7 +367,7 @@ class _PointsCard extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 6.0,
                               ),
-                              child: _ShimmerStat(),
+                              child: const _ShimmerStat(),
                             ),
                           ),
                           Container(
@@ -290,7 +380,7 @@ class _PointsCard extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 6.0,
                               ),
-                              child: _ShimmerStat(),
+                              child: const _ShimmerStat(),
                             ),
                           ),
                           Container(
@@ -303,7 +393,7 @@ class _PointsCard extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 6.0,
                               ),
-                              child: _ShimmerStat(),
+                              child: const _ShimmerStat(),
                             ),
                           ),
                         ],
@@ -342,22 +432,15 @@ class _PointsCard extends StatelessWidget {
 }
 
 class _ShimmerStat extends StatelessWidget {
+  const _ShimmerStat();
   @override
   Widget build(BuildContext context) {
-    return Shimmer(
-      gradient: LinearGradient(
-        colors: [
-          Colors.grey.shade300,
-          Colors.grey.shade100,
-          Colors.grey.shade300,
-        ],
-        stops: [0.1, 0.5, 0.9],
-        begin: Alignment.centerLeft,
-        end: Alignment.centerRight,
-      ),
-
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
       child: Container(
-        height: kToolbarHeight,
+        height: kToolbarHeight * 0.5,
+        width: double.infinity,
         decoration: BoxDecoration(
           color: Colors.grey.shade200,
           borderRadius: BorderRadius.circular(8),
@@ -368,32 +451,40 @@ class _ShimmerStat extends StatelessWidget {
 }
 
 class _Shortcut extends StatelessWidget {
-  const _Shortcut({required this.icon, required this.label});
+  const _Shortcut({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
 
   final IconData icon;
   final String label;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 100,
-      child: Column(
-        children: [
-          Container(
-            height: 56,
-            width: 56,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
+    return InkWell(
+      onTap: onTap,
+      child: SizedBox(
+        width: 100,
+        child: Column(
+          children: [
+            Container(
+              height: 56,
+              width: 56,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: primaryGreen, size: 26),
             ),
-            child: Icon(icon, color: primaryGreen, size: 26),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: CustomStyle.fourteen.copyWith(color: Colors.white),
-          ),
-        ],
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: CustomStyle.fourteen.copyWith(color: Colors.white),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -473,9 +564,10 @@ class _RecycleCategories extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, index) {
+          // Defensive: stop IndexError for recycled categories
+          if (index >= recycleLists.length) return const SizedBox.shrink();
           return InkWell(
             onTap: () {
-              // You need to create this list/map to match each category with the correct page/link
               final pages = [
                 PlasticsRecycleMethodDetailsView(),
                 GlassRecycleMethodDetailsView(),
@@ -487,7 +579,6 @@ class _RecycleCategories extends StatelessWidget {
                 OrganicRecycleMethodDetailsView(),
                 AluminiumRecyclingDetailsView(recycleItem: {}),
               ];
-
               if (index < pages.length) {
                 Navigator.push(
                   context,
@@ -511,15 +602,7 @@ class _RecycleCategories extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircleAvatar(
-                    backgroundColor: Colors.white,
-                    radius: 26,
-                    child: Icon(
-                      recycleLists[index].image,
-                      color: primaryGreen,
-                      size: 26,
-                    ),
-                  ),
+                  Image.asset(recycleLists[index].image, height: 52),
                   const SizedBox(height: 12),
                   Text(
                     recycleLists[index].title,

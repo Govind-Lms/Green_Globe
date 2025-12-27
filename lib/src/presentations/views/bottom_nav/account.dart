@@ -450,11 +450,11 @@ class _AccountState extends State<Account> {
               icon: Icons.notifications_outlined,
               title: 'Notifications',
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Notifications settings coming soon!'),
-                  ),
-                );
+                // ScaffoldMessenger.of(context).showSnackBar(
+                //   const SnackBar(
+                //     content: Text('Notifications settings coming soon!'),
+                //   ),
+                // );
                 // TODO: Navigate to notifications settings in the future
               },
             ),
@@ -462,11 +462,11 @@ class _AccountState extends State<Account> {
               icon: Icons.language_outlined,
               title: 'Change Language',
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Language settings coming soon!'),
-                  ),
-                );
+                // ScaffoldMessenger.of(context).showSnackBar(
+                //   const SnackBar(
+                //     content: Text('Language settings coming soon!'),
+                //   ),
+                // );
                 // TODO: Navigate to language settings in the future
               },
             ),
@@ -484,9 +484,9 @@ class _AccountState extends State<Account> {
               icon: Icons.info_outline,
               title: 'About',
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('About section coming soon!')),
-                );
+                // ScaffoldMessenger.of(context).showSnackBar(
+                //   const SnackBar(content: Text('About section coming soon!')),
+                // );
                 // TODO: Navigate to about page in the future
               },
             ),
@@ -500,7 +500,7 @@ class _AccountState extends State<Account> {
               },
             ),
             _SettingsItem(
-              icon: Iconsax.password_check,
+              icon: Iconsax.profile_delete,
               title: 'Delete Account',
               onTap: () {
                 _handleDeleteAccount(context);

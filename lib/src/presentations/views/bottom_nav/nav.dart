@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:green_globe/src/const/constant.dart';
 import 'package:green_globe/src/core/auth.dart';
+import 'package:green_globe/src/presentations/views/bottom_nav/QR/qr_scan_page.dart';
 import 'package:green_globe/src/presentations/views/bottom_nav/account.dart';
 import 'package:green_globe/src/presentations/views/bottom_nav/home/home_page.dart';
 
@@ -42,7 +43,9 @@ class _BottomNavState extends State<BottomNav> {
                 elevation: 0,
                 backgroundColor: Colors.white,
                 onPressed: () {
-                  // TODO: Implement FAB action
+                  Navigator.of(
+                    context,
+                  ).push(MaterialPageRoute(builder: (_) => QRScanPage()));
                 },
                 child: const Icon(Icons.qr_code, color: Colors.green, size: 32),
               ),

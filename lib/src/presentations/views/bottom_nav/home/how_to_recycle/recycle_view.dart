@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:green_globe/src/const/constant.dart';
 import 'package:green_globe/src/const/custom_style.dart';
 import 'package:green_globe/src/models/category_model.dart';
+import 'package:green_globe/src/presentations/views/bottom_nav/home/how_to_recycle/recycle_views/alluminum_view.dart';
+import 'package:green_globe/src/presentations/views/bottom_nav/home/how_to_recycle/recycle_views/cardboard.dart';
+import 'package:green_globe/src/presentations/views/bottom_nav/home/how_to_recycle/recycle_views/clothing_view.dart';
+import 'package:green_globe/src/presentations/views/bottom_nav/home/how_to_recycle/recycle_views/e_waste_view.dart';
+import 'package:green_globe/src/presentations/views/bottom_nav/home/how_to_recycle/recycle_views/glass_view.dart';
+import 'package:green_globe/src/presentations/views/bottom_nav/home/how_to_recycle/recycle_views/metal_view.dart';
+import 'package:green_globe/src/presentations/views/bottom_nav/home/how_to_recycle/recycle_views/organic_view.dart';
+import 'package:green_globe/src/presentations/views/bottom_nav/home/how_to_recycle/recycle_views/plastic_view.dart';
+import 'package:green_globe/src/presentations/views/bottom_nav/home/how_to_recycle/recycle_views/tyre_view.dart';
 
 class RecycleView extends StatelessWidget {
   const RecycleView({super.key});
@@ -23,62 +31,85 @@ class RecycleView extends StatelessWidget {
           child: Column(
             children: [
               ...List.generate(recycleLists.length, (index) {
-                return Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  margin: EdgeInsets.symmetric(vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(18),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 14,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              recycleLists[index].title,
-                              style: CustomStyle.sixteen.copyWith(
-                                fontWeight: FontWeight.w700,
-                                color: Colors.black87,
+                return InkWell(
+                  onTap: () {
+                    final pages = [
+                      PlasticsRecycleMethodDetailsView(),
+                      GlassRecycleMethodDetailsView(),
+                      CardboardRecycleMethodDetailsView(),
+                      TyreRecycleMethodDetailsView(),
+                      ClothingRecycleMethodDetailsView(),
+                      EwasteRecycleMethodDetailsView(),
+                      MetalRecycleMethodDetailsView(),
+                      OrganicRecycleMethodDetailsView(),
+                      AluminiumRecyclingDetailsView(recycleItem: {}),
+                    ];
+
+                    if (index < pages.length) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => pages[index]),
+                      );
+                    }
+                  },
+
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 14,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                recycleLists[index].title,
+                                style: CustomStyle.sixteen.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.black87,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              recycleLists[index].tip,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              textAlign: TextAlign.justify,
-                              style: CustomStyle.fourteen.copyWith(
-                                color: Colors.grey.shade700,
+                              const SizedBox(height: 8),
+                              Text(
+                                recycleLists[index].tip,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.justify,
+                                style: CustomStyle.fourteen.copyWith(
+                                  color: Colors.grey.shade700,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Container(
-                        height: 100,
-                        width: 80,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE8F7EE),
-                          borderRadius: BorderRadius.circular(14),
+                        const SizedBox(width: 12),
+                        Container(
+                          height: 100,
+                          width: 80,
+                          // decoration: BoxDecoration(
+                          //   color: const Color(0xFFE8F7EE),
+                          //   borderRadius: BorderRadius.circular(14),
+                          // ),
+                          child: Image.asset(
+                            recycleLists[index].image,
+                            fit: BoxFit.contain,
+                            height: 80,
+                          ),
                         ),
-                        child: Icon(
-                          recycleLists[index].image,
-                          color: primaryGreen,
-                          size: 28,
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               }),

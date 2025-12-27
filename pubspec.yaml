@@ -47,6 +47,9 @@ dependencies:
   supabase_flutter: ^2.5.6
   url_launcher: ^6.2.5
   swipe: ^0.0.1
+  mobile_scanner: ^7.1.4
+  permission_handler: ^11.3.1
+  google_maps_flutter: ^2.9.0
 
 dev_dependencies:
   flutter_test:
@@ -72,9 +75,20 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/
-    - assets/lotties/calendar.json
+    - assets/lotties/
     - assets/icons/
     - assets/uis/
+    - assets/icons/bins/
+    - assets/icons/Icons/
+    - assets/icons/Aluminium Recycling/
+    - assets/icons/Cardboard Recycling/
+    - assets/icons/Cloth Recycling/
+    - assets/icons/E-Waste Recycling/
+    - assets/icons/Glass Recycling/
+    - assets/icons/Metal Recycling/
+    - assets/icons/Organic Recycling/
+    - assets/icons/Tyre Recycling/
+
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

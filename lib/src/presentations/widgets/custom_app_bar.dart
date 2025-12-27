@@ -54,10 +54,10 @@ PreferredSizeWidget customAppBar(BuildContext context) {
       IconButton(
         icon: Icon(Icons.notifications),
         onPressed: () {
-          Navigator.of(
-            context,
-          ).push(MaterialPageRoute(builder: (_) => SignIn()));
-          // Add notification action here
+          // Navigator.of(
+          //   context,
+          // ).push(MaterialPageRoute(builder: (_) => SignIn()));
+          // // Add notification action here
         },
       ),
     ],
