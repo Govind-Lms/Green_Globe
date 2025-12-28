@@ -5,6 +5,7 @@ import 'package:green_globe/src/const/custom_style.dart';
 import 'package:green_globe/src/core/auth.dart';
 import 'package:green_globe/src/presentations/views/auth/change_password.dart';
 import 'package:green_globe/src/presentations/views/auth/sign_in.dart';
+import 'package:green_globe/src/presentations/views/bottom_nav/account/about_page.dart';
 import 'package:green_globe/src/presentations/views/bottom_nav/nav.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -23,8 +24,8 @@ class _AccountState extends State<Account> {
   bool _checkedAuth = false;
 
   int get _binsNotified {
-    if (_userData != null && _userData!['bins_notified'] != null) {
-      return _userData!['bins_notified'] as int;
+    if (_userData != null && _userData!['points_history'] != null) {
+      return (_userData!['points_history'] as List).length;
     }
     return 0;
   }
@@ -132,167 +133,6 @@ class _AccountState extends State<Account> {
           );
         }
       }
-    }
-  }
-
-  Future<void> _handleDeleteAccount(BuildContext context) async {
-    final passwordController = TextEditingController();
-    bool isDeleting = false;
-
-    await showDialog(
-      context: context,
-      barrierDismissible: !isDeleting,
-      builder: (BuildContext ctx) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return AlertDialog(
-              contentTextStyle: CustomStyle.fourteen,
-              titleTextStyle: CustomStyle.sixteen.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-              title: const Text('Delete Account'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    'Are you sure you want to delete your account? This action cannot be undone.',
-                    textAlign: TextAlign.justify,
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: passwordController,
-                    obscureText: true,
-                    enabled: !isDeleting,
-                    decoration: InputDecoration(
-                      labelText: 'Enter Password to Confirm',
-                      labelStyle: CustomStyle.twelve,
-                      border: const OutlineInputBorder(),
-                    ),
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: isDeleting
-                      ? null
-                      : () {
-                          Navigator.of(ctx).pop();
-                        },
-                  child: const Text('Cancel'),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                  onPressed: isDeleting
-                      ? null
-                      : () async {
-                          setState(() {
-                            isDeleting = true;
-                          });
-                          try {
-                            await AuthService.deleteAccount(
-                              password: passwordController.text.trim(),
-                            );
-                            if (ctx.mounted) {
-                              Navigator.of(ctx).pop();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Account deleted successfully.',
-                                  ),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
-                              Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                  builder: (_) => const SignIn(),
-                                ),
-                                (route) => false,
-                              );
-                            }
-                          } on AuthException catch (e) {
-                            setState(() {
-                              isDeleting = false;
-                            });
-                            if (ctx.mounted) {
-                              ScaffoldMessenger.of(ctx).showSnackBar(
-                                SnackBar(
-                                  content: Text(e.message),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            }
-                          } catch (e) {
-                            setState(() {
-                              isDeleting = false;
-                            });
-                            if (ctx.mounted) {
-                              ScaffoldMessenger.of(ctx).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Failed to delete account. Please try again.',
-                                  ),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            }
-                          }
-                        },
-                  child: isDeleting
-                      ? const SizedBox(
-                          width: 22,
-                          height: 22,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Text(
-                          'Delete',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Future<void> _openUrl(String url) async {
-    final uri = Uri.tryParse(url);
-    if (uri == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Invalid URL'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-    try {
-      if (!await launchUrl(
-        uri,
-        mode: LaunchMode.platformDefault,
-        webViewConfiguration: const WebViewConfiguration(
-          enableDomStorage: true,
-          enableJavaScript: true,
-        ),
-      )) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Could not launch $url'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to open link.'),
-          backgroundColor: Colors.red,
-        ),
-      );
     }
   }
 
@@ -424,7 +264,7 @@ class _AccountState extends State<Account> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: _InfoCard(
-                    icon: Icons.scatter_plot,
+                    icon: Iconsax.medal_star5,
                     value: '$_receivedPoints',
                     label: 'Points Used',
                   ),
@@ -445,67 +285,17 @@ class _AccountState extends State<Account> {
               ),
             ),
             const SizedBox(height: 16),
-            // Settings Items
-            _SettingsItem(
-              icon: Icons.notifications_outlined,
-              title: 'Notifications',
-              onTap: () {
-                // ScaffoldMessenger.of(context).showSnackBar(
-                //   const SnackBar(
-                //     content: Text('Notifications settings coming soon!'),
-                //   ),
-                // );
-                // TODO: Navigate to notifications settings in the future
-              },
-            ),
-            _SettingsItem(
-              icon: Icons.language_outlined,
-              title: 'Change Language',
-              onTap: () {
-                // ScaffoldMessenger.of(context).showSnackBar(
-                //   const SnackBar(
-                //     content: Text('Language settings coming soon!'),
-                //   ),
-                // );
-                // TODO: Navigate to language settings in the future
-              },
-            ),
-            _SettingsItem(
-              icon: Icons.description_outlined,
-              title: 'Terms & Conditions',
-              onTap: () => _openUrl(termsAndConditionsUrl),
-            ),
-            _SettingsItem(
-              icon: Icons.lock_outline,
-              title: 'Privacy Policy',
-              onTap: () => _openUrl(privacyPolicyUrl),
-            ),
+            
             _SettingsItem(
               icon: Icons.info_outline,
               title: 'About',
               onTap: () {
-                // ScaffoldMessenger.of(context).showSnackBar(
-                //   const SnackBar(content: Text('About section coming soon!')),
-                // );
-                // TODO: Navigate to about page in the future
+                Navigator.of(
+                  context,
+                ).push(MaterialPageRoute(builder: (_) => const AboutPage()));
               },
             ),
-            _SettingsItem(
-              icon: Iconsax.password_check,
-              title: 'Change Password',
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const ChangePasswordPage()),
-                );
-              },
-            ),
-            _SettingsItem(
-              icon: Iconsax.profile_delete,
-              title: 'Delete Account',
-              onTap: () {
-                _handleDeleteAccount(context);
-              },
-            ),
+
             _SettingsItem(
               icon: Iconsax.logout,
               title: 'Sign Out',

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:green_globe/src/const/constant.dart';
 import 'package:green_globe/src/core/auth.dart';
 import 'package:green_globe/src/presentations/views/bottom_nav/QR/qr_scan_page.dart';
-import 'package:green_globe/src/presentations/views/bottom_nav/account.dart';
+import 'package:green_globe/src/presentations/views/bottom_nav/account/account.dart';
 import 'package:green_globe/src/presentations/views/bottom_nav/home/home_page.dart';
 
 class BottomNav extends StatefulWidget {

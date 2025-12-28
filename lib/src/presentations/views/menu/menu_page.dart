@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:green_globe/src/const/constant.dart';
 import 'package:green_globe/src/const/custom_style.dart';
+import 'package:green_globe/src/presentations/views/menu/bins/smart_bins.dart';
 import 'package:green_globe/src/presentations/views/menu/events/empty_event.dart';
 import 'package:green_globe/src/presentations/views/menu/leaderboard/leaderboard_view.dart';
+import 'package:green_globe/src/presentations/views/menu/points/redeem_points.dart';
 import 'package:swipe/swipe.dart';
 
 class MenuPage extends StatelessWidget {
@@ -71,13 +73,27 @@ class MenuPage extends StatelessWidget {
                       _MenuItem(
                         icon: Icons.delete_outline,
                         label: 'Smart Bins',
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const SmartBinsPage(),
+                            ),
+                          );
+                        },
                       ),
                       SizedBox(height: 24),
                       _MenuItem(
                         icon: Icons.scatter_plot_outlined,
                         label: 'Points',
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const RedeemPoints(),
+                            ),
+                          );
+                        },
                       ),
                       SizedBox(height: 24),
                       _MenuItem(

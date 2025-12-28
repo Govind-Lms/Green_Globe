@@ -24,7 +24,7 @@ var profilePictureUrls = [
 ];
 
 List<Map<String, dynamic>> bins = [
-  {'name': 'Bin 1', 'image': Icon(Icons.delete)},
+  {'name': 'Bin 1', 'image': "assets/images/blue.png"},
   {'name': 'Bin 2', 'image': Icon(Icons.delete)},
   {'name': 'Bin 3', 'image': Icon(Icons.delete)},
   {'name': 'Bin 4', 'image': Icon(Icons.delete)},

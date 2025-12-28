@@ -95,7 +95,7 @@ class RecycleView extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 12),
-                        Container(
+                        SizedBox(
                           height: 100,
                           width: 80,
                           // decoration: BoxDecoration(

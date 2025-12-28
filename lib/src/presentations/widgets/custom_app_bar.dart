@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:green_globe/src/const/custom_style.dart';
-import 'package:green_globe/src/presentations/views/auth/sign_in.dart';
 import 'package:green_globe/src/presentations/views/menu/menu_page.dart';
 import 'package:iconsax/iconsax.dart';
 

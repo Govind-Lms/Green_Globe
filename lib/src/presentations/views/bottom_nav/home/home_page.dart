@@ -24,156 +24,20 @@ import 'package:green_globe/src/presentations/views/bottom_nav/home/how_to_recyc
 import 'package:green_globe/src/presentations/views/bottom_nav/home/how_to_recycle/recycle_views/plastic_view.dart';
 import 'package:green_globe/src/presentations/views/bottom_nav/home/how_to_recycle/recycle_views/tyre_view.dart';
 import 'package:green_globe/src/presentations/views/menu/auctions/auction_page.dart';
+import 'package:green_globe/src/presentations/views/menu/bins/smart_bins.dart';
 import 'package:green_globe/src/presentations/widgets/custom_app_bar.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: customAppBar(context),
-      backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 12),
-                  const _PointsCard(),
-                  const SizedBox(height: 24),
-                  _SectionHeader(
-                    title: 'HOW TO RECYCLE?',
-                    onSeeAll: () {
-                      Navigator.of(
-                        context,
-                      ).push(MaterialPageRoute(builder: (_) => RecycleView()));
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  _RecycleCategories(),
-                  const SizedBox(height: 22),
-                  _SectionHeader(
-                    title: 'Eco-Friendly Tips',
-                    onSeeAll: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => EcoFriendlyView()),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  // _EcoFriendlyPart(),
-                  ...List.generate(
-                    ecoLists.length,
-                    (index) => Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16),
-                      margin: const EdgeInsets.symmetric(vertical: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(18),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 14,
-                            offset: const Offset(0, 6),
-                          ),
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 14,
-                            offset: const Offset(-6, -6),
-                          ),
-                        ],
-                      ),
-                      child: InkWell(
-                        onTap: () {
-                          final pages = [
-                            PlantATreeDetailsView(ecoModel: ecoLists[index]),
-                            ReusableBagsDetailsView(ecoModel: ecoLists[index]),
-                            SaveWaterDetailsView(ecoModel: ecoLists[index]),
-                            FoodWasteDetailsView(ecoModel: ecoLists[index]),
-                            ReuseBeforeDetailsView(ecoModel: ecoLists[index]),
-                            EcoTransportDetailsView(ecoModel: ecoLists[index]),
-                            UnplugDetailsView(ecoModel: ecoLists[index]),
-                            EcoProductDetailsView(ecoModel: ecoLists[index]),
-                          ];
-                          // Defensive: avoid out-of-bounds
-                          if (index < pages.length) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => pages[index],
-                              ),
-                            );
-                          }
-                        },
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    ecoLists[index].title,
-                                    style: CustomStyle.sixteen.copyWith(
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    ecoLists[index].shortDesc,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    textAlign: TextAlign.justify,
-                                    style: CustomStyle.fourteen.copyWith(
-                                      color: Colors.grey.shade700,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            SizedBox(
-                              height: 100,
-                              width: 60,
-                              child: Image.asset(
-                                ecoLists[index].icon,
-                                height: 40,
-                                fit: BoxFit.scaleDown,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _PointsCard extends StatefulWidget {
-  const _PointsCard();
-
-  @override
-  State<_PointsCard> createState() => _PointsCardState();
-}
-
-class _PointsCardState extends State<_PointsCard> {
-  bool _pointsVisible = true;
-
+class _HomePageState extends State<HomePage> {
   // Cache the user stats for cleaner toggling UI
   Future<Map<String, dynamic>?>? _userStatsFuture;
 
@@ -203,9 +67,9 @@ class _PointsCardState extends State<_PointsCard> {
             .eq('email', userEmail!)
             .maybeSingle(); // Use maybeSingle to avoid crash when not found
         final pointHistory = (userData?['points_history'] as List?) ?? [];
-        final binsNearby = barcodeLists.length;
+        // final binsNearby = barcodeLists.length;
         return <String, dynamic>{
-          'smart_bins_nearby': "$binsNearby",
+          'smart_bins_nearby': "0",
           'bins_notified': "${pointHistory.length}",
           'points_used': "0",
           'points_history': pointHistory,
@@ -233,6 +97,169 @@ class _PointsCardState extends State<_PointsCard> {
     }
   }
 
+  void _refreshStat() {
+    if (mounted) {
+      setState(() {
+        _userStatsFuture = _fetchUserStats(context);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: customAppBar(context),
+      backgroundColor: Colors.white,
+      body: RefreshIndicator(
+        onRefresh: () async {
+          _refreshStat();
+          await Future.delayed(const Duration(milliseconds: 100));
+        },
+
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 12),
+                    _PointsCard(_userStatsFuture),
+                    const SizedBox(height: 24),
+                    _SectionHeader(
+                      title: 'HOW TO RECYCLE?',
+                      onSeeAll: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => RecycleView()),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    _RecycleCategories(),
+                    const SizedBox(height: 22),
+                    _SectionHeader(
+                      title: 'Eco-Friendly Tips',
+                      onSeeAll: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => EcoFriendlyView()),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    // _EcoFriendlyPart(),
+                    ...List.generate(
+                      ecoLists.length,
+                      (index) => Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        margin: const EdgeInsets.symmetric(vertical: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(18),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 14,
+                              offset: const Offset(0, 6),
+                            ),
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 14,
+                              offset: const Offset(-6, -6),
+                            ),
+                          ],
+                        ),
+                        child: InkWell(
+                          onTap: () {
+                            final pages = [
+                              PlantATreeDetailsView(ecoModel: ecoLists[index]),
+                              ReusableBagsDetailsView(
+                                ecoModel: ecoLists[index],
+                              ),
+                              SaveWaterDetailsView(ecoModel: ecoLists[index]),
+                              FoodWasteDetailsView(ecoModel: ecoLists[index]),
+                              ReuseBeforeDetailsView(ecoModel: ecoLists[index]),
+                              EcoTransportDetailsView(
+                                ecoModel: ecoLists[index],
+                              ),
+                              UnplugDetailsView(ecoModel: ecoLists[index]),
+                              EcoProductDetailsView(ecoModel: ecoLists[index]),
+                            ];
+                            // Defensive: avoid out-of-bounds
+                            if (index < pages.length) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => pages[index],
+                                ),
+                              );
+                            }
+                          },
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      ecoLists[index].title,
+                                      style: CustomStyle.sixteen.copyWith(
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      ecoLists[index].shortDesc,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.justify,
+                                      style: CustomStyle.fourteen.copyWith(
+                                        color: Colors.grey.shade700,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              SizedBox(
+                                height: 100,
+                                width: 60,
+                                child: Image.asset(
+                                  ecoLists[index].icon,
+                                  height: 40,
+                                  fit: BoxFit.scaleDown,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PointsCard extends StatefulWidget {
+  final Future<Map<String, dynamic>?>? _userStatsFuture;
+  const _PointsCard(this._userStatsFuture);
+
+  @override
+  State<_PointsCard> createState() => _PointsCardState();
+}
+
+class _PointsCardState extends State<_PointsCard> {
+  bool _pointsVisible = true;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -256,7 +283,7 @@ class _PointsCardState extends State<_PointsCard> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               FutureBuilder<Map<String, dynamic>?>(
-                future: _userStatsFuture,
+                future: widget._userStatsFuture,
                 builder: (context, snapshot) {
                   int totalPoints = 0;
                   final userData = snapshot.data;
@@ -311,7 +338,11 @@ class _PointsCardState extends State<_PointsCard> {
               _Shortcut(
                 icon: Icons.delete_outline,
                 label: 'Smart Bin',
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(
+                    context,
+                  ).push(MaterialPageRoute(builder: (_) => SmartBinsPage()));
+                },
               ),
               _Shortcut(
                 icon: Icons.gavel_outlined,
@@ -331,7 +362,7 @@ class _PointsCardState extends State<_PointsCard> {
           ),
           const SizedBox(height: 18),
           FutureBuilder<Map<String, dynamic>?>(
-            future: _userStatsFuture,
+            future: widget._userStatsFuture,
             builder: (context, snapshot) {
               final isLoading =
                   snapshot.connectionState == ConnectionState.waiting;

@@ -22,42 +22,37 @@ class _QRScanPageState extends State<QRScanPage> {
     if (!isScanning) return;
     final String? code = barcode.barcodes.first.rawValue;
     if (code != null) {
-      setState(() {
-        scannedCode = code;
+      if (code.startsWith('ID:BIN_')) {
+        setState(() {
+          scannedCode = code;
+          isScanning = false;
+        });
+        Navigator.pop(context);
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => ScannedPage(code: code)));
+      } else {
         isScanning = false;
-      });
-      Navigator.pop(context);
-      Navigator.of(
-        context,
-      ).push(MaterialPageRoute(builder: (_) => ScannedPage(code: code)));
+        showDialog(
+          context: context,
+
+          builder: (context) => AlertDialog(
+            title: const Text('Invalid QR Code'),
+            content: const Text('This QR code is not valid for this app.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  isScanning = true;
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
     }
   }
-
-  // void _showResultDialog(String code) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => AlertDialog(
-  //       title: const Text('QR Code Found'),
-  //       content: Text(code),
-  //       actions: [
-  //         TextButton(
-  //           onPressed: () {
-  //             Navigator.of(context).pop();
-  //             setState(() {
-  //               isScanning = true;
-  //               scannedCode = null;
-  //             });
-  //           },
-  //           child: const Text('Scan Again'),
-  //         ),
-  //         TextButton(
-  //           onPressed: () => Navigator.of(context).pop(),
-  //           child: const Text('Close'),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 
   @override
   void initState() {
