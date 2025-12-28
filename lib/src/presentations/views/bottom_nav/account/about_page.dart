@@ -5,7 +5,6 @@ import 'package:green_globe/src/core/auth.dart';
 import 'package:green_globe/src/presentations/views/auth/change_password.dart';
 import 'package:green_globe/src/presentations/views/auth/sign_in.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 

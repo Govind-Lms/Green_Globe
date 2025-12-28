@@ -3,13 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:green_globe/src/const/constant.dart';
 import 'package:green_globe/src/const/custom_style.dart';
 import 'package:green_globe/src/core/auth.dart';
-import 'package:green_globe/src/presentations/views/auth/change_password.dart';
 import 'package:green_globe/src/presentations/views/auth/sign_in.dart';
 import 'package:green_globe/src/presentations/views/bottom_nav/account/about_page.dart';
 import 'package:green_globe/src/presentations/views/bottom_nav/nav.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class Account extends StatefulWidget {
   const Account({super.key});

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:green_globe/src/const/custom_style.dart';
 
 class AnimatedBinStatusCard extends StatelessWidget {
   final Color color;
