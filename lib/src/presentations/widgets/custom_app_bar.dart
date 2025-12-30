@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:green_globe/src/const/custom_style.dart';
 import 'package:green_globe/src/presentations/views/menu/menu_page.dart';
 import 'package:green_globe/src/presentations/views/menu/noti/noti_page.dart';
 import 'package:iconsax/iconsax.dart';
