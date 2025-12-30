@@ -25,6 +25,7 @@ import 'package:green_globe/src/presentations/views/bottom_nav/home/how_to_recyc
 import 'package:green_globe/src/presentations/views/bottom_nav/home/how_to_recycle/recycle_views/tyre_view.dart';
 import 'package:green_globe/src/presentations/views/menu/auctions/auction_page.dart';
 import 'package:green_globe/src/presentations/views/menu/bins/smart_bins.dart';
+import 'package:green_globe/src/presentations/views/menu/points/redeem_points.dart';
 import 'package:green_globe/src/presentations/widgets/custom_app_bar.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:shimmer/shimmer.dart';
@@ -67,7 +68,6 @@ class _HomePageState extends State<HomePage> {
             .eq('email', userEmail!)
             .maybeSingle(); // Use maybeSingle to avoid crash when not found
         final pointHistory = (userData?['points_history'] as List?) ?? [];
-        // final binsNearby = barcodeLists.length;
         return <String, dynamic>{
           'smart_bins_nearby': "0",
           'bins_notified': "${pointHistory.length}",
@@ -109,7 +109,6 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: customAppBar(context),
-      backgroundColor: Colors.white,
       body: RefreshIndicator(
         onRefresh: () async {
           _refreshStat();
@@ -225,7 +224,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                               const SizedBox(width: 12),
                               SizedBox(
-                                height: 100,
+                                height: 60,
                                 width: 60,
                                 child: Image.asset(
                                   ecoLists[index].icon,
@@ -303,7 +302,7 @@ class _PointsCardState extends State<_PointsCard> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        _pointsVisible ? '$totalPoints Points' : '••••••',
+                        _pointsVisible ? '$totalPoints Points' : '*** Points',
                         style: CustomStyle.twenty.copyWith(
                           fontSize: 22,
                           color: Colors.white,
@@ -356,7 +355,11 @@ class _PointsCardState extends State<_PointsCard> {
               _Shortcut(
                 icon: Iconsax.medal_star5,
                 label: 'Points',
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(
+                    context,
+                  ).push(MaterialPageRoute(builder: (_) => RedeemPoints()));
+                },
               ),
             ],
           ),
@@ -396,9 +399,9 @@ class _PointsCardState extends State<_PointsCard> {
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 6.0,
+                                horizontal: 12.0,
                               ),
-                              child: const _ShimmerStat(),
+                              child: const _ShimmerStat('Smart\nBins Nearby'),
                             ),
                           ),
                           Container(
@@ -409,9 +412,11 @@ class _PointsCardState extends State<_PointsCard> {
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 6.0,
+                                horizontal: 12,
                               ),
-                              child: const _ShimmerStat(),
+                              child: const _ShimmerStat(
+                                "Bins\nYou've Notified",
+                              ),
                             ),
                           ),
                           Container(
@@ -422,9 +427,9 @@ class _PointsCardState extends State<_PointsCard> {
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 6.0,
+                                horizontal: 12,
                               ),
-                              child: const _ShimmerStat(),
+                              child: const _ShimmerStat('Points\nUsed'),
                             ),
                           ),
                         ],
@@ -463,20 +468,31 @@ class _PointsCardState extends State<_PointsCard> {
 }
 
 class _ShimmerStat extends StatelessWidget {
-  const _ShimmerStat();
+  final String label;
+  const _ShimmerStat(this.label);
   @override
   Widget build(BuildContext context) {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey.shade300,
-      highlightColor: Colors.grey.shade100,
-      child: Container(
-        height: kToolbarHeight * 0.5,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(8),
+    return Column(
+      children: [
+        Shimmer.fromColors(
+          baseColor: Colors.grey.shade300,
+          highlightColor: Colors.grey.shade100,
+          child: Container(
+            height: kToolbarHeight * 0.55,
+            width: kToolbarHeight,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade200,
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
         ),
-      ),
+        Text(
+          label,
+          textAlign: TextAlign.center,
+          maxLines: 2,
+          style: CustomStyle.twelve.copyWith(color: Colors.grey.shade700),
+        ),
+      ],
     );
   }
 }
@@ -608,7 +624,9 @@ class _RecycleCategories extends StatelessWidget {
                 EwasteRecycleMethodDetailsView(),
                 MetalRecycleMethodDetailsView(),
                 OrganicRecycleMethodDetailsView(),
-                AluminiumRecyclingDetailsView(recycleItem: {}),
+                AluminiumRecyclingDetailsView(
+                  recycleModel: recycleLists[index],
+                ),
               ];
               if (index < pages.length) {
                 Navigator.push(

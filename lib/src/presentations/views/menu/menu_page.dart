@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:green_globe/src/const/constant.dart';
 import 'package:green_globe/src/const/custom_style.dart';
+import 'package:green_globe/src/presentations/views/bottom_nav/account/about_page.dart';
 import 'package:green_globe/src/presentations/views/menu/bins/smart_bins.dart';
 import 'package:green_globe/src/presentations/views/menu/events/empty_event.dart';
 import 'package:green_globe/src/presentations/views/menu/leaderboard/leaderboard_view.dart';
+import 'package:green_globe/src/presentations/views/menu/marketplace/marketplace.dart';
 import 'package:green_globe/src/presentations/views/menu/points/redeem_points.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:swipe/swipe.dart';
 
 class MenuPage extends StatelessWidget {
@@ -33,14 +36,6 @@ class MenuPage extends StatelessWidget {
                       onPressed: () => Navigator.of(context).maybePop(),
                     ),
                     const Spacer(),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.notifications_none,
-                        color: Colors.white,
-                        size: 24,
-                      ),
-                      onPressed: () {},
-                    ),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -48,7 +43,7 @@ class MenuPage extends StatelessWidget {
                   child: Column(
                     children: [
                       Text(
-                        'GreenGlobe',
+                        'Green Globe',
                         style: CustomStyle.twenty.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.w700,
@@ -67,7 +62,14 @@ class MenuPage extends StatelessWidget {
                       _MenuItem(
                         icon: Icons.shopping_bag_outlined,
                         label: 'Marketplace',
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const MarketplacePage(),
+                            ),
+                          );
+                        },
                       ),
                       SizedBox(height: 24),
                       _MenuItem(
@@ -84,7 +86,7 @@ class MenuPage extends StatelessWidget {
                       ),
                       SizedBox(height: 24),
                       _MenuItem(
-                        icon: Icons.scatter_plot_outlined,
+                        icon: Iconsax.medal_star5,
                         label: 'Points',
                         onTap: () {
                           Navigator.pop(context);
@@ -97,7 +99,7 @@ class MenuPage extends StatelessWidget {
                       ),
                       SizedBox(height: 24),
                       _MenuItem(
-                        icon: Icons.insert_drive_file_outlined,
+                        icon: Iconsax.ranking_15,
                         label: 'Leaderboard',
                         onTap: () {
                           Navigator.pop(context);
@@ -125,7 +127,14 @@ class MenuPage extends StatelessWidget {
                       _MenuItem(
                         icon: Icons.settings_outlined,
                         label: 'Settings',
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const AboutPage(),
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -144,7 +153,7 @@ class MenuPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'GovindDev X ArcherSolution',
+                        'Europa'.toUpperCase(),
                         style: CustomStyle.fourteenWhite.copyWith(
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.4,

@@ -24,9 +24,9 @@ class ReusableBagsDetailsView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 10),
-           EcoImageBuilder(
+            EcoImageBuilder(
               image: ecoModel.image,
-              text: ecoModel.title,
+              text: ecoModel.newtitle,
               shortDesc: ecoModel.shortDesc,
             ),
 

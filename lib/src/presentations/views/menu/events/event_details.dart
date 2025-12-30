@@ -4,27 +4,20 @@ import 'package:flutter/material.dart';
 
 import 'package:green_globe/src/const/constant.dart';
 import 'package:green_globe/src/const/custom_style.dart';
+import 'package:green_globe/src/models/event_model.dart';
 
 class EventDetailsPage extends StatelessWidget {
-  final String imageUrl, eventName, eventTime;
-  const EventDetailsPage({
-    super.key,
-    required this.imageUrl,
-    required this.eventName,
-    required this.eventTime,
-  });
+  final EventModel eventModel;
+  const EventDetailsPage({super.key, required this.eventModel});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
           "Event Details",
           style: CustomStyle.twenty.copyWith(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
       ),
       body: SafeArea(
         bottom: false,
@@ -35,7 +28,9 @@ class EventDetailsPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _HeroSection(imageUrl: imageUrl),
+                    _HeroSection(
+                      imageUrl: "assets/icons/Event_Images/${eventModel.image}",
+                    ),
                     const SizedBox(height: 24),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 22),
@@ -43,35 +38,37 @@ class EventDetailsPage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            eventName,
+                            eventModel.name,
+
                             style: CustomStyle.twenty.copyWith(
                               fontSize: 30,
                               fontWeight: FontWeight.w700,
                               color: Colors.black87,
                             ),
+                            maxLines: 2,
                           ),
                           const SizedBox(height: 24),
                           _InfoRow(
                             iconBg: const Color(0xFFE5F4EB),
                             icon: Icons.calendar_today_rounded,
                             iconColor: primaryGreen,
-                            title: '14 December, 2025',
-                            subtitle: 'Tuesday, 4:00PM - 9:00PM',
+                            title: eventModel.date,
+                            subtitle: eventModel.time,
                           ),
                           const SizedBox(height: 16),
                           _InfoRow(
                             iconBg: const Color(0xFFE5F4EB),
                             icon: Icons.location_on_rounded,
                             iconColor: primaryGreen,
-                            title: 'Gala Convention Center',
-                            subtitle: '36 Guild Street Mandalay, MN',
+                            title: eventModel.locationName,
+                            subtitle: eventModel.locationAddress,
                           ),
                           const SizedBox(height: 16),
                           _InfoRow(
                             iconBg: const Color(0xFFFFF2E7),
                             icon: Icons.person,
                             iconColor: Colors.orange,
-                            title: 'Youth Empowerment Org.',
+                            title: eventModel.organizer,
                             subtitle: 'Organizer',
                           ),
                           const SizedBox(height: 24),
@@ -85,8 +82,7 @@ class EventDetailsPage extends StatelessWidget {
                           const SizedBox(height: 10),
                           Text.rich(
                             TextSpan(
-                              text:
-                                  "Let's come together to make our community shine! Join your neighbors for a day of teamwork and community spirit as we pick up litter, clear. ",
+                              text: eventModel.description,
                               style: CustomStyle.fourteen.copyWith(
                                 height: 1.5,
                                 color: Colors.black87,
@@ -110,41 +106,41 @@ class EventDetailsPage extends StatelessWidget {
                 ),
               ),
             ),
-            SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(22, 0, 22, 18),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: kToolbarHeight,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryGreen,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 6,
-                      shadowColor: primaryGreen.withOpacity(0.4),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'VOLUNTEER',
-                          style: CustomStyle.sixteenWhite.copyWith(
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        const Icon(Icons.arrow_forward, color: Colors.white),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            // SafeArea(
+            //   top: false,
+            //   child: Padding(
+            //     padding: const EdgeInsets.fromLTRB(22, 0, 22, 18),
+            //     child: SizedBox(
+            //       width: double.infinity,
+            //       height: kToolbarHeight,
+            //       child: ElevatedButton(
+            //         onPressed: () {},
+            //         style: ElevatedButton.styleFrom(
+            //           backgroundColor: primaryGreen,
+            //           shape: RoundedRectangleBorder(
+            //             borderRadius: BorderRadius.circular(16),
+            //           ),
+            //           elevation: 6,
+            //           shadowColor: primaryGreen.withOpacity(0.4),
+            //         ),
+            //         child: Row(
+            //           mainAxisAlignment: MainAxisAlignment.center,
+            //           children: [
+            //             Text(
+            //               'VOLUNTEER',
+            //               style: CustomStyle.sixteenWhite.copyWith(
+            //                 fontWeight: FontWeight.w700,
+            //                 letterSpacing: 0.5,
+            //               ),
+            //             ),
+            //             const SizedBox(width: 10),
+            //             const Icon(Icons.arrow_forward, color: Colors.white),
+            //           ],
+            //         ),
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -159,16 +155,14 @@ class _HeroSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        SizedBox(
-          height: 260,
-          width: double.infinity,
-          child: CachedNetworkImage(imageUrl: imageUrl, fit: BoxFit.cover),
-        ),
-        Positioned(bottom: -32, left: 24, right: 24, child: _GoingCard()),
-      ],
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 20),
+      height: 260,
+      width: double.infinity,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Image.asset(imageUrl, fit: BoxFit.cover),
+      ),
     );
   }
 }

@@ -3,7 +3,7 @@ import 'package:green_globe/src/const/constant.dart';
 import 'package:green_globe/src/const/custom_style.dart';
 import 'package:green_globe/src/core/auth.dart';
 import 'package:green_globe/src/presentations/views/auth/change_password.dart';
-import 'package:green_globe/src/presentations/views/auth/sign_in.dart';
+import 'package:green_globe/src/presentations/views/bottom_nav/nav.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -70,8 +70,8 @@ class _AboutPageState extends State<AboutPage> {
                             isDeleting = true;
                           });
                           try {
-                            await AuthService.deleteAccount(
-                              password: passwordController.text.trim(),
+                            await AuthService.deleteAccountViaEdgeFunction(
+                              passwordController.text.trim(),
                             );
                             if (ctx.mounted) {
                               Navigator.of(ctx).pop();
@@ -83,9 +83,10 @@ class _AboutPageState extends State<AboutPage> {
                                   backgroundColor: Colors.green,
                                 ),
                               );
+
                               Navigator.of(context).pushAndRemoveUntil(
                                 MaterialPageRoute(
-                                  builder: (_) => const SignIn(),
+                                  builder: (_) => const BottomNav(),
                                 ),
                                 (route) => false,
                               );
@@ -331,11 +332,18 @@ class _AboutPageState extends State<AboutPage> {
                       color: primaryGreen,
                       size: 24,
                     ),
-                    title: Text('Delete Account', style: CustomStyle.sixteen),
+                    title: Text(
+                      'Delete Account',
+                      style: CustomStyle.sixteen.copyWith(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     trailing: Icon(
                       Icons.chevron_right,
                       color: Colors.grey.shade400,
                     ),
+
                     onTap: () async {
                       _handleDeleteAccount(context);
                     },
@@ -382,26 +390,26 @@ class _AboutPageState extends State<AboutPage> {
                     ),
                     onTap: _handleEmailFeedback,
                   ),
-                  Divider(height: 1, color: Colors.grey.shade200),
-                  ListTile(
-                    leading: Icon(Iconsax.share, color: primaryGreen, size: 24),
-                    title: Text('Share App', style: CustomStyle.sixteen),
-                    trailing: Icon(
-                      Icons.chevron_right,
-                      color: Colors.grey.shade400,
-                    ),
-                    // onTap: _handleShareApp,
-                  ),
-                  Divider(height: 1, color: Colors.grey.shade200),
-                  ListTile(
-                    leading: Icon(Iconsax.star, color: primaryGreen, size: 24),
-                    title: Text('Rate App', style: CustomStyle.sixteen),
-                    trailing: Icon(
-                      Icons.chevron_right,
-                      color: Colors.grey.shade400,
-                    ),
-                    // onTap: _handleRateApp,
-                  ),
+                  // Divider(height: 1, color: Colors.grey.shade200),
+                  // ListTile(
+                  //   leading: Icon(Iconsax.share, color: primaryGreen, size: 24),
+                  //   title: Text('Share App', style: CustomStyle.sixteen),
+                  //   trailing: Icon(
+                  //     Icons.chevron_right,
+                  //     color: Colors.grey.shade400,
+                  //   ),
+                  //   // onTap: _handleShareApp,
+                  // ),
+                  // Divider(height: 1, color: Colors.grey.shade200),
+                  // ListTile(
+                  //   leading: Icon(Iconsax.star, color: primaryGreen, size: 24),
+                  //   title: Text('Rate App', style: CustomStyle.sixteen),
+                  //   trailing: Icon(
+                  //     Icons.chevron_right,
+                  //     color: Colors.grey.shade400,
+                  //   ),
+                  //   // onTap: _handleRateApp,
+                  // ),
                 ],
               ),
             ),

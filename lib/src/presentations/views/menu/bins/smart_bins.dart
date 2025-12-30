@@ -129,7 +129,7 @@ class _SmartBinsPageState extends State<SmartBinsPage> {
     _userLocation = _userLocation;
     if (_mapController != null) {
       _mapController!.animateCamera(
-        CameraUpdate.newLatLngZoom(_userLocation, 15),
+        CameraUpdate.newLatLngZoom(_userLocation, 18),
       );
     }
   }
@@ -189,10 +189,7 @@ class _SmartBinsPageState extends State<SmartBinsPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: primaryGreen),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+
         title: Text(
           'Smart Bins',
           style: CustomStyle.twenty.copyWith(fontWeight: FontWeight.bold),
@@ -265,14 +262,17 @@ class _SmartBinsPageState extends State<SmartBinsPage> {
                         ],
                       ),
                       clipBehavior: Clip.antiAlias,
+
                       child: Stack(
                         children: [
                           GoogleMap(
                             initialCameraPosition: CameraPosition(
                               target: _userLocation,
-                              zoom: 15,
+                              zoom: 18,
                             ),
-                            zoomGesturesEnabled: true,
+                            scrollGesturesEnabled: true,
+                            myLocationButtonEnabled: true,
+                            zoomControlsEnabled: true,
                             mapType: MapType.normal,
                             markers: _markers,
                             onMapCreated:
@@ -280,28 +280,32 @@ class _SmartBinsPageState extends State<SmartBinsPage> {
                                   _mapController = controller;
                                   await _loadBins();
                                 },
-                            myLocationButtonEnabled: false,
-                            zoomControlsEnabled: false,
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 16),
 
-                    // Action Buttons
-                    const SizedBox(height: 20),
-                    // Progress Bars Section
-                    _buildProgressBar(
-                      color: Colors.red,
-                      label: 'Full Bins',
-                      value: 0.3,
-                    ),
-                    const SizedBox(height: 12),
-                    _buildProgressBar(
-                      color: primaryGreen,
-                      label: 'Available Bins',
-                      value: 0.7,
-                    ),
+                    // // Action Buttons
+                    // const SizedBox(height: 20),
+                    // // Progress Bars Section
+                    // _buildProgressBar(
+                    //   color: Colors.red,
+                    //   label: 'Full Bins',
+                    //   value: 0.9,
+                    // ),
+                    // const SizedBox(height: 12),
+                    // _buildProgressBar(
+                    //   color: Colors.orange,
+                    //   label: 'Nearly Full Bins',
+                    //   value: 0.7,
+                    // ),
+                    // const SizedBox(height: 12),
+                    // _buildProgressBar(
+                    //   color: primaryGreen,
+                    //   label: 'Available Bins',
+                    //   value: 0.3,
+                    // ),
+                    // const SizedBox(height: 20),
                   ],
                 ),
               ),

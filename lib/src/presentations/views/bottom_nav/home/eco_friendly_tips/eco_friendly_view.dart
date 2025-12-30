@@ -68,12 +68,9 @@ class EcoFriendlyView extends StatelessWidget {
                     child: Row(
                       children: [
                         SizedBox(
-                          height: 100,
-                          width: 80,
-                          child: Image.asset(
-                            ecoLists[index].image,
-                            height: 100,
-                          ),
+                          height: 60,
+                          width: 60,
+                          child: Image.asset(ecoLists[index].icon),
                         ),
                         const SizedBox(width: 12),
                         Expanded(

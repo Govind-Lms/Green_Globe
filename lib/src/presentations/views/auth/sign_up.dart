@@ -1,6 +1,5 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:green_globe/src/const/constant.dart';
 import 'package:green_globe/src/const/custom_style.dart';
 import 'package:green_globe/src/presentations/views/auth/sign_in.dart';
@@ -75,7 +74,7 @@ class _SignUpState extends State<SignUp> {
       // Show success, navigate to sign in screen
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Account created! Please sign in.'),
+          content: Text('Verification link has been sent.'),
           backgroundColor: Colors.green,
         ),
       );
@@ -103,7 +102,7 @@ class _SignUpState extends State<SignUp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      appBar: AppBar(),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -219,27 +218,27 @@ class _SignUpState extends State<SignUp> {
               ),
               const SizedBox(height: 24),
 
-              // OR divider
-              Center(child: Text('OR', style: CustomStyle.fourteen)),
-              const SizedBox(height: 24),
+              // // OR divider
+              // Center(child: Text('OR', style: CustomStyle.fourteen)),
+              // const SizedBox(height: 24),
 
-              // Google button
-              _SocialButton(
-                text: 'Login with Google',
-                icon: FontAwesomeIcons.google,
-                iconColor: const Color(0xFFDB4437),
-                onTap: () {},
-              ),
-              const SizedBox(height: 16),
+              // // Google button
+              // _SocialButton(
+              //   text: 'Login with Google',
+              //   icon: FontAwesomeIcons.google,
+              //   iconColor: const Color(0xFFDB4437),
+              //   onTap: () {},
+              // ),
+              // const SizedBox(height: 16),
 
-              // Facebook button
-              _SocialButton(
-                text: 'Login with Facebook',
-                icon: FontAwesomeIcons.facebook,
-                iconColor: const Color(0xFF1877F2),
-                onTap: () {},
-              ),
-              const SizedBox(height: 32),
+              // // Facebook button
+              // _SocialButton(
+              //   text: 'Login with Facebook',
+              //   icon: FontAwesomeIcons.facebook,
+              //   iconColor: const Color(0xFF1877F2),
+              //   onTap: () {},
+              // ),
+              // const SizedBox(height: 32),
 
               // Bottom sign up text
               RichText(

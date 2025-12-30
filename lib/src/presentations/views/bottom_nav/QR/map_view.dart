@@ -17,7 +17,7 @@ class MapView extends StatefulWidget {
 
 class _MapViewState extends State<MapView> {
   GoogleMapController? _mapController;
-  final MapType _mapType = MapType.hybrid;
+  final MapType _mapType = MapType.normal;
   late LatLng _binLocation;
   late String _binId;
   Set<Marker> _markers = {};
@@ -151,7 +151,10 @@ class _MapViewState extends State<MapView> {
                 ),
               ],
             ),
-          );
+          ).whenComplete(() {
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
+          });
         }
         return;
       }
@@ -209,7 +212,10 @@ class _MapViewState extends State<MapView> {
               ),
             ],
           ),
-        );
+        ).whenComplete(() {
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+        });
       }
     } catch (e) {
       if (mounted) {

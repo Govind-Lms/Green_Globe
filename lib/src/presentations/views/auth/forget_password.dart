@@ -45,6 +45,17 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
       );
       return;
     }
+    // final userLists = await AuthService.getUsers(email);
+
+    // if (userLists == null || userLists.isEmpty) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(
+    //       content: Text('Email not found. Please enter a registered email!'),
+    //       backgroundColor: Colors.red,
+    //     ),
+    //   );
+    //   return;
+    // }
 
     setState(() {
       _isLoading = true;
@@ -63,7 +74,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
           ),
         );
         // Optionally navigate back after showing success message
-        Future.delayed(const Duration(seconds: 2), () {
+        Future.delayed(const Duration(milliseconds: 300), () {
           if (mounted) {
             Navigator.of(context).pop();
           }
@@ -96,32 +107,20 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Text(
+          'Reset Password',
+          style: CustomStyle.twenty.copyWith(fontWeight: FontWeight.bold),
+        ),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Back button and title header
-              Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.black),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Reset Password',
-                    style: CustomStyle.fourteen.copyWith(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-
               // Descriptive text
               Text(
                 'Please enter your email address to request a password reset',

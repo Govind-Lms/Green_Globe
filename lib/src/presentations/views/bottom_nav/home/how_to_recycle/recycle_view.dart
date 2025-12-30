@@ -42,7 +42,9 @@ class RecycleView extends StatelessWidget {
                       EwasteRecycleMethodDetailsView(),
                       MetalRecycleMethodDetailsView(),
                       OrganicRecycleMethodDetailsView(),
-                      AluminiumRecyclingDetailsView(recycleItem: {}),
+                      AluminiumRecyclingDetailsView(
+                        recycleModel: recycleLists[index],
+                      ),
                     ];
 
                     if (index < pages.length) {
@@ -96,16 +98,11 @@ class RecycleView extends StatelessWidget {
                         ),
                         const SizedBox(width: 12),
                         SizedBox(
-                          height: 100,
-                          width: 80,
-                          // decoration: BoxDecoration(
-                          //   color: const Color(0xFFE8F7EE),
-                          //   borderRadius: BorderRadius.circular(14),
-                          // ),
+                          height: 60,
+                          width: 60,
                           child: Image.asset(
                             recycleLists[index].image,
                             fit: BoxFit.contain,
-                            height: 80,
                           ),
                         ),
                       ],

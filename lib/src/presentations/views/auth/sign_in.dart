@@ -1,6 +1,5 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:green_globe/src/const/constant.dart';
 import 'package:green_globe/src/const/custom_style.dart';
 import 'package:green_globe/src/presentations/views/auth/sign_up.dart';
@@ -52,9 +51,10 @@ class _SignInState extends State<SignIn> {
 
       // You can navigate to the home/dashboard screen here
       // For now, just show success
-      Navigator.of(
-        context,
-      ).pushReplacement(MaterialPageRoute(builder: (_) => BottomNav()));
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => BottomNav()),
+        (route) => false,
+      );
       // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => HomePage()));
     } on AuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -225,27 +225,27 @@ class _SignInState extends State<SignIn> {
               ),
               const SizedBox(height: 24),
 
-              // OR divider
-              Center(child: Text('OR', style: CustomStyle.fourteen)),
-              const SizedBox(height: 24),
+              // // OR divider
+              // Center(child: Text('OR', style: CustomStyle.fourteen)),
+              // const SizedBox(height: 24),
 
-              // Google button
-              _SocialButton(
-                text: 'Login with Google',
-                icon: FontAwesomeIcons.google,
-                iconColor: const Color(0xFFDB4437),
-                onTap: () {},
-              ),
-              const SizedBox(height: 16),
+              // // Google button
+              // _SocialButton(
+              //   text: 'Login with Google',
+              //   icon: FontAwesomeIcons.google,
+              //   iconColor: const Color(0xFFDB4437),
+              //   onTap: () {},
+              // ),
+              // const SizedBox(height: 16),
 
-              // Facebook button
-              _SocialButton(
-                text: 'Login with Facebook',
-                icon: FontAwesomeIcons.facebook,
-                iconColor: const Color(0xFF1877F2),
-                onTap: () {},
-              ),
-              const SizedBox(height: 32),
+              // // Facebook button
+              // _SocialButton(
+              //   text: 'Login with Facebook',
+              //   icon: FontAwesomeIcons.facebook,
+              //   iconColor: const Color(0xFF1877F2),
+              //   onTap: () {},
+              // ),
+              // const SizedBox(height: 32),
 
               // Bottom sign up text
               RichText(
@@ -261,9 +261,9 @@ class _SignInState extends State<SignIn> {
                       ),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(builder: (_) => SignUp()),
-                          );
+                          Navigator.of(
+                            context,
+                          ).push(MaterialPageRoute(builder: (_) => SignUp()));
                         },
                     ),
                   ],

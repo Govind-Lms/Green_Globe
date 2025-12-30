@@ -6,6 +6,7 @@ import 'package:green_globe/src/core/auth.dart';
 import 'package:green_globe/src/presentations/views/auth/sign_in.dart';
 import 'package:green_globe/src/presentations/views/bottom_nav/account/about_page.dart';
 import 'package:green_globe/src/presentations/views/bottom_nav/nav.dart';
+import 'package:green_globe/src/presentations/views/menu/noti/noti_page.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -172,8 +173,13 @@ class _AccountState extends State<Account> {
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_none_outlined),
-            onPressed: () {},
+            icon: Icon(Icons.notifications),
+            onPressed: () {
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => NotificationPage()));
+              // Add notification action here
+            },
           ),
         ],
       ),
@@ -201,11 +207,10 @@ class _AccountState extends State<Account> {
                 const SizedBox(height: 20),
                 // Level and Points
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      width: 40,
-                      height: 40,
+                      width: 20,
+                      height: 20,
                       decoration: BoxDecoration(
                         color: primaryGreen,
                         shape: BoxShape.circle,
@@ -213,20 +218,20 @@ class _AccountState extends State<Account> {
                       child: Center(
                         child: Text(
                           '$level',
-                          style: CustomStyle.fourteenWhite.copyWith(
+                          style: CustomStyle.twelveWhite.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 10),
                     Text(
                       'Level $level',
                       style: CustomStyle.sixteen.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(width: 24),
+                    Spacer(),
                     RichText(
                       text: TextSpan(
                         text: '$currentLevelPoints/',
@@ -283,7 +288,7 @@ class _AccountState extends State<Account> {
               ),
             ),
             const SizedBox(height: 16),
-            
+
             _SettingsItem(
               icon: Icons.info_outline,
               title: 'About',

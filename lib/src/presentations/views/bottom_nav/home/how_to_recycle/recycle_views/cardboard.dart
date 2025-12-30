@@ -26,7 +26,7 @@ class CardboardRecycleMethodDetailsView extends StatelessWidget {
             SizedBox(height: 10),
             ImageBuilder(
               context: context,
-              image: 'assets/icons/plastics1.jpeg',
+              image: 'assets/icons/Cardboard Recycling/cardboard1.jpg',
               text:
                   "Newspapers, magazines, cereal boxes, mail, and flattened cardboard boxes (remove staples/tape).",
             ),
@@ -83,7 +83,11 @@ class CardboardRecycleMethodDetailsView extends StatelessWidget {
               normalText: "Recycled cardboard boxes can be used again.",
             ),
 
-            ImageBuilder(context: context, image: 'assets/', text: ''),
+            ImageBuilder(
+              context: context,
+              image: 'assets/icons/Cardboard Recycling/cardboard2.jpg',
+              text: '',
+            ),
             TitleBuilder(title: 'How to recycle your cardbaord?'),
             Text(
               "One of the most obvious ways is to use the recycling bin provided by your local council.",
@@ -156,7 +160,11 @@ class CardboardRecycleMethodDetailsView extends StatelessWidget {
               normalText:
                   "Landfill sites are huge producers of greenhouse gases. When cardboard is sent to landfill, as it breaks down it releases methane, one of the most harmful greenhouse gases, into our atmosphere.",
             ),
-            ImageBuilder(context: context, image: "assets/", text: ""),
+            ImageBuilder(
+              context: context,
+              image: 'assets/icons/Cardboard Recycling/cardboard3.jpg',
+              text: "",
+            ),
 
             TitleBuilder(title: "Paper and cardboard recycling facts"),
             SizedBox(height: 10),

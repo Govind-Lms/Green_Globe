@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:green_globe/src/const/constant.dart';
 import 'package:green_globe/src/const/custom_style.dart';
 import 'package:green_globe/src/core/auth.dart';
+import 'package:green_globe/src/presentations/views/menu/points/specific_points_page.dart';
+import 'package:lottie/lottie.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:intl/intl.dart';
 
 class RedeemPoints extends StatefulWidget {
   const RedeemPoints({super.key});
@@ -13,7 +15,6 @@ class RedeemPoints extends StatefulWidget {
 }
 
 class _RedeemPointsState extends State<RedeemPoints> {
-  Map<String, dynamic>? _userData;
   bool _isLoading = true;
 
   @override
@@ -29,14 +30,13 @@ class _RedeemPointsState extends State<RedeemPoints> {
     try {
       final user = AuthService.getCurrentUser();
       if (user != null) {
-        final response = await Supabase.instance.client
+        await Supabase.instance.client
             .from('users')
             .select()
             .eq('user_id', user.id)
             .maybeSingle();
 
         setState(() {
-          _userData = response;
           _isLoading = false;
         });
       } else {
@@ -51,29 +51,42 @@ class _RedeemPointsState extends State<RedeemPoints> {
     }
   }
 
-  List<Map<String, dynamic>> _getPointsHistory() {
-    if (_userData == null || _userData!['points_history'] == null) {
-      return [];
+  Future<Map<String, int>> getTotalPointsByMessage() async {
+    final user = AuthService.getCurrentUser();
+    final client = Supabase.instance.client;
+    final userEmail = user?.email;
+
+    if (userEmail == null) return {};
+
+    final userData = await client
+        .from('users')
+        .select('points_history')
+        .eq('email', userEmail)
+        .maybeSingle();
+
+    final pointHistory = (userData?['points_history'] as List?) ?? [];
+
+    // Map to store message -> total points
+    final Map<String, int> pointsByMessage = {};
+
+    for (final entry in pointHistory) {
+      if (entry is Map) {
+        final String message = (entry['message'] ?? '').toString();
+        final earned = entry['points_earned'];
+        int earnedPoints = 0;
+        try {
+          earnedPoints = earned is int
+              ? earned
+              : int.tryParse(earned.toString()) ?? 0;
+        } catch (_) {}
+        if (message.isNotEmpty) {
+          pointsByMessage[message] =
+              (pointsByMessage[message] ?? 0) + earnedPoints;
+        }
+      }
     }
-    final history = _userData!['points_history'] as List?;
-    if (history == null) return [];
 
-    return history
-        .where((entry) => entry is Map && entry['points_earned'] != null)
-        .map((entry) => Map<String, dynamic>.from(entry as Map))
-        .toList()
-      ..sort((a, b) {
-        final timeA = a['time'] as String? ?? '';
-        final timeB = b['time'] as String? ?? '';
-        return timeB.compareTo(timeA); // Sort by newest first
-      });
-  }
-
-  List<Map<String, dynamic>> _getEventPoints() {
-    final allPoints = _getPointsHistory();
-    // Filter for event-related points or use a subset
-    // For now, return first 10 entries as event points
-    return allPoints.take(10).toList();
+    return pointsByMessage;
   }
 
   @override
@@ -90,18 +103,11 @@ class _RedeemPointsState extends State<RedeemPoints> {
       );
     }
 
-    final pointsHistory = _getPointsHistory();
-    final eventPoints = _getEventPoints();
+    // final eventPoints = _getEventPoints();
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
         title: Text(
           'Rewards',
           style: CustomStyle.twenty.copyWith(fontWeight: FontWeight.bold),
@@ -185,19 +191,6 @@ class _RedeemPointsState extends State<RedeemPoints> {
                             ],
                           ),
                         ),
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: primaryGreen.withOpacity(0.1),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.refresh,
-                            color: primaryGreen,
-                            size: 24,
-                          ),
-                        ),
                       ],
                     ),
                   ),
@@ -208,127 +201,394 @@ class _RedeemPointsState extends State<RedeemPoints> {
             // POINTS Section
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'POINTS',
-                    style: CustomStyle.eighteen.copyWith(
-                      color: primaryGreen,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      'See All',
-                      style: CustomStyle.fourteen.copyWith(
-                        color: secondaryGreen,
-                      ),
-                    ),
-                  ),
-                ],
+              child: Text(
+                'POINTS',
+                style: CustomStyle.eighteen.copyWith(
+                  color: primaryGreen,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             const SizedBox(height: 12),
 
             // Points Cards
-            if (pointsHistory.isEmpty)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: accentGreen,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'No points earned yet',
-                      style: CustomStyle.sixteen.copyWith(
-                        color: Colors.grey[600],
+            FutureBuilder(
+              future: getTotalPointsByMessage(),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (AuthService.isSignedIn() == false) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: accentGreen,
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                    ),
-                  ),
-                ),
-              )
-            else
-              ...pointsHistory.take(2).map((entry) {
-                final points = entry['points_earned'] ?? 0;
-                final message = entry['message'] ?? 'Points earned';
-
-                return Padding(
-                  padding: const EdgeInsets.only(
-                    left: 20,
-                    right: 20,
-                    bottom: 12,
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: accentGreen,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        // Star Icon
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: Colors.yellow[300],
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.star,
-                            color: Colors.yellow[800],
-                            size: 28,
+                      child: Center(
+                        child: Text(
+                          'You are not signed in.\nPlease Sign In First',
+                          textAlign: TextAlign.center,
+                          style: CustomStyle.sixteen.copyWith(
+                            color: Colors.grey[600],
                           ),
                         ),
-                        const SizedBox(width: 16),
-                        // Points Info
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                      ),
+                    ),
+                  );
+                } else if (snapshot.connectionState ==
+                    ConnectionState.waiting) {
+                } else if (snapshot.hasError) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: accentGreen,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Error loading points',
+                          style: CustomStyle.sixteen.copyWith(
+                            color: Colors.red,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                } else if (!snapshot.hasData ||
+                    snapshot.data == null ||
+                    (snapshot.data is Map && snapshot.data.isEmpty)) {
+                  final entries = [
+                    {
+                      'message': 'Request the Garbage Truck',
+                      "points_earned": 0,
+                    },
+                    {
+                      'message': 'Odorous Bins? Request for Cleaning',
+                      "points_earned": 0,
+                    },
+                  ];
+                  return Column(
+                    children: entries.map((entry) {
+                      final message = entry['message'] ?? '';
+                      final points = entry['points_earned'] ?? 0;
+
+                      return InkWell(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => SpecificPointsPage(
+                                message: message.toString(),
+                              ),
+                            ),
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            left: 20,
+                            right: 20,
+                            bottom: 12,
+                          ),
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: accentGreen,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              children: [
+                                // Star Icon
+                                Container(
+                                  width: 48,
+                                  height: 48,
+                                  decoration: BoxDecoration(
+                                    color: Colors.yellow[300],
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.star,
+                                    color: Colors.yellow[800],
+                                    size: 28,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                // Points Info
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '$points Points Earned!',
+                                        style: CustomStyle.sixteen.copyWith(
+                                          color: primaryGreen,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        message.toString(),
+                                        style: CustomStyle.fourteen.copyWith(
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                // Arrow Icon
+                                Container(
+                                  width: 32,
+                                  height: 32,
+                                  decoration: BoxDecoration(
+                                    color: Colors.black,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.arrow_forward,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  );
+                  // return Padding(
+                  //   padding: const EdgeInsets.symmetric(horizontal: 20),
+                  //   child: Container(
+                  //     padding: const EdgeInsets.all(20),
+                  //     decoration: BoxDecoration(
+                  //       color: accentGreen,
+                  //       borderRadius: BorderRadius.circular(12),
+                  //     ),
+                  //     child: Center(
+                  //       child: Text(
+                  //         'No points earned yet',
+                  //         style: CustomStyle.sixteen.copyWith(
+                  //           color: Colors.grey[600],
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // );
+                }
+
+                final pointsHistory = snapshot.data;
+                // If pointsHistory is a Map<String, int> or List<Map<String, dynamic>>
+                // Adjust accordingly to your getTotalPointsByMessage() return type
+                // Let's assume it's Map<String, int> as per "byMessage"
+                if (pointsHistory is Map<String, int>) {
+                  final entries = pointsHistory.entries.toList();
+
+                  return Column(
+                    children: entries.map((entry) {
+                      final message = entry.key;
+                      final points = entry.value;
+
+                      return InkWell(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  SpecificPointsPage(message: message),
+                            ),
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            left: 20,
+                            right: 20,
+                            bottom: 12,
+                          ),
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: accentGreen,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              children: [
+                                // Star Icon
+                                Container(
+                                  width: 48,
+                                  height: 48,
+                                  decoration: BoxDecoration(
+                                    color: Colors.yellow[300],
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.star,
+                                    color: Colors.yellow[800],
+                                    size: 28,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                // Points Info
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '$points Points Earned!',
+                                        style: CustomStyle.sixteen.copyWith(
+                                          color: primaryGreen,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        message,
+                                        style: CustomStyle.fourteen.copyWith(
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                // Arrow Icon
+                                Container(
+                                  width: 32,
+                                  height: 32,
+                                  decoration: BoxDecoration(
+                                    color: Colors.black,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.arrow_forward,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  );
+                } else if (pointsHistory is List) {
+                  if (pointsHistory.isEmpty) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: accentGreen,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'No points earned yet',
+                            style: CustomStyle.sixteen.copyWith(
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                  return Column(
+                    children: pointsHistory.map<Widget>((entry) {
+                      final points = entry['points_earned'] ?? 0;
+                      final message = entry['message'] ?? 'Points earned';
+                      return Padding(
+                        padding: const EdgeInsets.only(
+                          left: 20,
+                          right: 20,
+                          bottom: 12,
+                        ),
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: accentGreen,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
                             children: [
-                              Text(
-                                '$points Points Earned!',
-                                style: CustomStyle.sixteen.copyWith(
-                                  color: primaryGreen,
-                                  fontWeight: FontWeight.bold,
+                              // Star Icon
+                              Container(
+                                width: 48,
+                                height: 48,
+                                decoration: BoxDecoration(
+                                  color: Colors.yellow[300],
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.star,
+                                  color: Colors.yellow[800],
+                                  size: 28,
                                 ),
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                message,
-                                style: CustomStyle.fourteen.copyWith(
-                                  color: Colors.grey[600],
+                              const SizedBox(width: 16),
+                              // Points Info
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '$points Points Earned!',
+                                      style: CustomStyle.sixteen.copyWith(
+                                        color: primaryGreen,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      message,
+                                      style: CustomStyle.fourteen.copyWith(
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // Arrow Icon
+                              Container(
+                                width: 32,
+                                height: 32,
+                                decoration: BoxDecoration(
+                                  color: Colors.black,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.arrow_forward,
+                                  color: Colors.white,
+                                  size: 18,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        // Arrow Icon
-                        Container(
-                          width: 32,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.arrow_forward,
-                            color: Colors.white,
-                            size: 18,
-                          ),
+                      );
+                    }).toList(),
+                  );
+                }
+                // Fallback for unexpected data type
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Center(
+                    child: Shimmer.fromColors(
+                      baseColor: Colors.grey.shade300,
+                      highlightColor: Colors.grey.shade100,
+                      child: Container(
+                        height: 200,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade200,
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 );
-              }),
-
-            const SizedBox(height: 32),
+              },
+            ),
+            const SizedBox(height: 12),
 
             // POINTS FROM EVENTS Section
             Padding(
@@ -344,99 +604,122 @@ class _RedeemPointsState extends State<RedeemPoints> {
             const SizedBox(height: 12),
 
             // Event Points Horizontal List
-            if (eventPoints.isEmpty)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'No event points yet',
-                      style: CustomStyle.fourteen.copyWith(
-                        color: Colors.grey[600],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      height: 220,
+                      child: Lottie.asset(
+                        'assets/lotties/calendar.json',
+                        fit: BoxFit.contain,
+                        repeat: true,
                       ),
                     ),
-                  ),
-                ),
-              )
-            else
-              SizedBox(
-                height: 120,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  itemCount: eventPoints.length,
-                  itemBuilder: (context, index) {
-                    final entry = eventPoints[index];
-                    final points = entry['points_earned'] ?? 0;
-                    final timeStr = entry['time'] as String? ?? '';
-
-                    DateTime? date;
-                    if (timeStr.isNotEmpty) {
-                      try {
-                        date = DateTime.parse(timeStr);
-                      } catch (_) {}
-                    }
-                    final formattedDate = date != null
-                        ? DateFormat('d/M/yyyy').format(date)
-                        : 'N/A';
-
-                    // Cycle through colors
-                    final colors = [
-                      Colors.yellow,
-                      Colors.grey,
-                      Colors.brown[300]!,
-                    ];
-                    final color = colors[index % colors.length];
-
-                    return Container(
-                      width: 100,
-                      margin: const EdgeInsets.only(right: 12),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey[200]!),
+                    const SizedBox(height: 24),
+                    Text(
+                      'No Point from Events',
+                      textAlign: TextAlign.center,
+                      style: CustomStyle.twenty.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black87,
                       ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: color,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            formattedDate,
-                            style: CustomStyle.twelve.copyWith(
-                              fontWeight: FontWeight.w500,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '$points',
-                            style: CustomStyle.fourteen.copyWith(
-                              color: color,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Earn points by participating in environmental initiatives and activities.',
+                      textAlign: TextAlign.center,
+                      style: CustomStyle.fourteen.copyWith(
+                        color: Colors.grey.shade600,
                       ),
-                    );
-                  },
+                    ),
+                    const SizedBox(height: 24),
+                  ],
                 ),
               ),
+            ),
+            // else
+            //   SizedBox(
+            //     height: 120,
+            //     child: ListView.builder(
+            //       scrollDirection: Axis.horizontal,
+            //       padding: const EdgeInsets.symmetric(horizontal: 20),
+            //       itemCount: eventPoints.length,
+            //       itemBuilder: (context, index) {
+            //         final entry = eventPoints[index];
+            //         final points = entry['points_earned'] ?? 0;
+            //         final timeStr = entry['time'] as String? ?? '';
 
-            const SizedBox(height: 32),
+            //         DateTime? date;
+            //         if (timeStr.isNotEmpty) {
+            //           try {
+            //             date = DateTime.parse(timeStr);
+            //           } catch (_) {}
+            //         }
+            //         final formattedDate = date != null
+            //             ? DateFormat('d/M/yyyy').format(date)
+            //             : 'N/A';
+
+            //         // Cycle through colors
+            //         final colors = [
+            //           Colors.yellow,
+            //           Colors.grey,
+            //           Colors.brown[300]!,
+            //         ];
+            //         final color = colors[index % colors.length];
+
+            //         return Container(
+            //           width: 100,
+            //           margin: const EdgeInsets.only(right: 12),
+            //           padding: const EdgeInsets.all(12),
+            //           decoration: BoxDecoration(
+            //             color: Colors.white,
+            //             borderRadius: BorderRadius.circular(12),
+            //             border: Border.all(color: Colors.grey[200]!),
+            //           ),
+            //           child: Column(
+            //             mainAxisAlignment: MainAxisAlignment.center,
+            //             children: [
+            //               Container(
+            //                 width: 40,
+            //                 height: 40,
+            //                 decoration: BoxDecoration(
+            //                   color: color,
+            //                   shape: BoxShape.circle,
+            //                 ),
+            //               ),
+            //               const SizedBox(height: 12),
+            //               Text(
+            //                 formattedDate,
+            //                 style: CustomStyle.twelve.copyWith(
+            //                   fontWeight: FontWeight.w500,
+            //                 ),
+            //                 textAlign: TextAlign.center,
+            //               ),
+            //               const SizedBox(height: 4),
+            //               Text(
+            //                 '$points',
+            //                 style: CustomStyle.fourteen.copyWith(
+            //                   color: color,
+            //                   fontWeight: FontWeight.bold,
+            //                 ),
+            //               ),
+            //             ],
+            //           ),
+            //         );
+            //       },
+            //     ),
+            //   ),
+
+            // const SizedBox(height: 32),
           ],
         ),
       ),

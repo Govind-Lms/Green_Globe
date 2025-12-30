@@ -24,7 +24,7 @@ class MetalRecycleMethodDetailsView extends StatelessWidget {
             SizedBox(height: 10),
             ImageBuilder(
               context: context,
-              image: 'assets/icons/plastics1.jpeg',
+              image: 'assets/icons/Metal Recycling/metal.jpg',
               text: "Aluminum (cans), steel/tin (food cans).",
             ),
 
@@ -51,7 +51,7 @@ class MetalRecycleMethodDetailsView extends StatelessWidget {
             TitleBuilder(title: "Steps to Recycle Metal Waste"),
             ImageBuilder(
               context: context,
-              image: 'assets/icons/plastics1.jpeg',
+              image: 'assets/icons/Metal Recycling/metal2.png',
               text: "",
             ),
 

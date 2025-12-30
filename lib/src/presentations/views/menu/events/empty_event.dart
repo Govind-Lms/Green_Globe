@@ -26,102 +26,90 @@ class _EmptyEventsPageState extends State<EmptyEventsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
           'Events',
           style: CustomStyle.twenty.copyWith(fontWeight: FontWeight.bold),
         ),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.more_vert, color: Colors.black),
-            onPressed: () {},
-          ),
-        ],
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            const SizedBox(height: 8),
-            _SegmentedTabs(
-              selectedIndex: _selectedTab,
-              onTabChanged: _onTabChanged,
-            ),
-            const SizedBox(height: 32),
-            Expanded(
-              child: _selectedTab == 0
-                  ? Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          height: 220,
-                          child: Lottie.asset(
-                            'assets/lotties/calendar.json',
-                            fit: BoxFit.contain,
-                            repeat: true,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          'No Upcoming\nEvent',
-                          textAlign: TextAlign.center,
-                          style: CustomStyle.twenty.copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          'Search for a particular event.',
-                          style: CustomStyle.fourteen.copyWith(
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                      ],
-                    )
-                  : PastEventsPage(),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-              child: SizedBox(
-                width: 300,
-                height: kToolbarHeight,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(
-                      context,
-                    ).push(MaterialPageRoute(builder: (_) => EventsPage()));
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryGreen,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    elevation: 6,
-                    shadowColor: primaryGreen.withOpacity(0.35),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+      body: Column(
+        children: [
+          const SizedBox(height: 8),
+          _SegmentedTabs(
+            selectedIndex: _selectedTab,
+            onTabChanged: _onTabChanged,
+          ),
+          const SizedBox(height: 32),
+          Expanded(
+            child: _selectedTab == 0
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Text(
-                        'EXPLORE EVENTS',
-                        style: CustomStyle.sixteenWhite.copyWith(
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.4,
+                      SizedBox(
+                        height: 220,
+                        child: Lottie.asset(
+                          'assets/lotties/calendar.json',
+                          fit: BoxFit.contain,
+                          repeat: true,
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      const Icon(Icons.arrow_forward, color: Colors.white),
+                      const SizedBox(height: 12),
+                      Text(
+                        'No Upcoming\nEvent',
+                        textAlign: TextAlign.center,
+                        style: CustomStyle.twenty.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Search for a particular event.',
+                        style: CustomStyle.fourteen.copyWith(
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
                     ],
+                  )
+                : PastEventsPage(),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+            child: SizedBox(
+              width: 300,
+              height: kToolbarHeight,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(
+                    context,
+                  ).push(MaterialPageRoute(builder: (_) => EventsPage()));
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryGreen,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
                   ),
+                  elevation: 6,
+                  shadowColor: primaryGreen.withOpacity(0.35),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'EXPLORE EVENTS',
+                      style: CustomStyle.sixteenWhite.copyWith(
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.4,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Icon(Icons.arrow_forward, color: Colors.white),
+                  ],
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

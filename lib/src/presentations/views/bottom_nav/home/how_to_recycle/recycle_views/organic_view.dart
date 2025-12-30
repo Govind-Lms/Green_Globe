@@ -26,7 +26,7 @@ class OrganicRecycleMethodDetailsView extends StatelessWidget {
             SizedBox(height: 10),
             ImageBuilder(
               context: context,
-              image: 'assets/icons/plastics1.jpeg',
+              image: 'assets/icons/Organic Recycling/compost.jpg',
               text: "Food scraps and yard waste can be composted separately.",
             ),
             Text(
@@ -34,16 +34,19 @@ class OrganicRecycleMethodDetailsView extends StatelessWidget {
               style: CustomStyle.twelve,
               textAlign: TextAlign.justify,
             ),
+            SizedBox(height: 10),
             QuoteView(
               quote:
                   "Compost is an essential element for soil fertility. Storing waste and allowing it to decompose slowly is returning to the earth what it has given us and at the same time is a positive gesture for the planet.",
               color: primaryGreen,
             ),
+            SizedBox(height: 10),
             Text(
               "Composting is the process of fermentation and transformation of organic matter which, thanks to the presence of oxygen, allows for the production of stabilised and topsoil rich fertilising material: compost. It is used often in gardening and agriculture to improve soil quality.",
               style: CustomStyle.twelve,
               textAlign: TextAlign.justify,
             ),
+            SizedBox(height: 10),
             Text(
               "Waste is a resource which isn’t used. Recycling waste and turning it into compost is a very under-utilised resource. Nevertheless, there are many benefits to composting, including:",
               style: CustomStyle.twelve,
@@ -66,7 +69,7 @@ class OrganicRecycleMethodDetailsView extends StatelessWidget {
             ),
             ImageBuilder(
               context: context,
-              image: "assets/icons/plastics3.png",
+              image: "assets/icons/Organic Recycling/compost2.png",
               text: '',
             ),
 
@@ -97,7 +100,7 @@ class OrganicRecycleMethodDetailsView extends StatelessWidget {
             ),
             ImageBuilder(
               context: context,
-              image: "assets/icons/plastics2.png",
+              image: "assets/icons/Organic Recycling/compost3.jpg",
               text: '',
             ),
 

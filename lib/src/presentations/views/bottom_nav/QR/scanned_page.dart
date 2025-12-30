@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:green_globe/src/const/constant.dart';
 import 'package:green_globe/src/const/custom_style.dart';
 import 'package:green_globe/src/presentations/views/bottom_nav/QR/map_view.dart';
+import 'package:iconsax/iconsax.dart';
 
 class ScannedPage extends StatelessWidget {
   final String code;
@@ -88,7 +89,7 @@ class ScannedPage extends StatelessWidget {
                       Row(
                         children: [
                           const Icon(
-                            Icons.check_circle,
+                            Iconsax.verify5,
                             color: primaryGreen,
                             size: 24,
                           ),

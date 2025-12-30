@@ -2,7 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:green_globe/src/const/constant.dart';
 import 'package:green_globe/src/const/custom_style.dart';
+import 'package:green_globe/src/models/event_model.dart';
 import 'package:green_globe/src/presentations/views/menu/events/event_details.dart';
+import 'package:lottie/lottie.dart';
 
 class EventsPage extends StatefulWidget {
   const EventsPage({super.key});
@@ -22,39 +24,6 @@ class _EventsPageState extends State<EventsPage> {
     }
   }
 
-  final List<_EventItem> _events = [
-    _EventItem(
-      title: 'Community\nCleaning Event',
-      date: '1st  May- Sat -2:00 PM',
-      image:
-          'https://plus.unsplash.com/premium_photo-1681487469745-91d1d8a5836b?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGV2ZW50c3xlbnwwfHwwfHx8MA%3D%3D',
-    ),
-    _EventItem(
-      title: 'Tidy Up\nDay',
-      date: '1st  May- Sat -2:00 PM',
-      image:
-          'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=400&q=80',
-    ),
-    _EventItem(
-      title: 'Fresh Start\nInitiative',
-      date: '1st  May- Sat -2:00 PM',
-      image:
-          'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
-    ),
-    _EventItem(
-      title: 'The Clean\nCollective',
-      date: '1st  May- Sat -2:00 PM',
-      image:
-          'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=400&q=80',
-    ),
-    _EventItem(
-      title: 'Sparkle\nSquad',
-      date: '1st  May- Sat -2:00 PM',
-      image:
-          'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=400&q=80',
-    ),
-  ];
-
   String _searchName = '';
 
   void _onSearchChanged(String value) {
@@ -63,25 +32,36 @@ class _EventsPageState extends State<EventsPage> {
     });
   }
 
-  List<_EventItem> get _filteredEvents {
-    if (_searchName.isEmpty) return _events;
-    return _events.where((event) {
-      return event.title.toLowerCase().contains(_searchName);
+  List<EventModel> get _filteredEvents {
+    if (_searchName.isEmpty) return events;
+    return events.where((event) {
+      return event.name.toLowerCase().contains(_searchName);
     }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
+    // Filter events based on tab and search query
+    List<EventModel> filteredList;
+    if (_selectedTab == 0) {
+      filteredList = _filteredEvents;
+    } else if (_selectedTab == 1) {
+      filteredList = _filteredEvents
+          .where((event) => event.type == 'global')
+          .toList();
+    } else {
+      filteredList = _filteredEvents
+          .where((event) => event.type == 'local')
+          .toList();
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
           "Events",
           style: CustomStyle.twenty.copyWith(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
       ),
-      backgroundColor: Colors.white,
       body: Column(
         children: [
           Padding(
@@ -95,18 +75,48 @@ class _EventsPageState extends State<EventsPage> {
             selectedIndex: _selectedTab,
             onTabChanged: _onTabChanged,
           ),
+          SizedBox(height: 10),
           Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-              ).copyWith(bottom: 24),
-              itemCount: _filteredEvents.length,
-              separatorBuilder: (_, _) => const SizedBox(height: 16),
-              itemBuilder: (context, index) {
-                final item = _filteredEvents[index];
-                return _EventCard(item: item);
-              },
-            ),
+            child: filteredList.isNotEmpty
+                ? ListView.separated(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                    ).copyWith(bottom: 24),
+                    itemCount: filteredList.length,
+                    separatorBuilder: (_, _) => const SizedBox(height: 16),
+                    itemBuilder: (context, index) {
+                      final item = filteredList[index];
+                      return _EventCard(item: item);
+                    },
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 220,
+                        child: Lottie.asset(
+                          'assets/lotties/calendar.json',
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'No Events Found',
+                        textAlign: TextAlign.center,
+                        style: CustomStyle.twenty.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Try searching for another event or change the tab.',
+                        style: CustomStyle.fourteen.copyWith(
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
           ),
         ],
       ),
@@ -153,8 +163,6 @@ class _EventsPageState extends State<EventsPage> {
             ),
           ),
         ),
-        // const SizedBox(width: 12),
-        // _FilterButton(onPressed: () {}),
       ],
     );
   }
@@ -163,20 +171,14 @@ class _EventsPageState extends State<EventsPage> {
 class _EventCard extends StatelessWidget {
   const _EventCard({required this.item});
 
-  final _EventItem item;
+  final EventModel item;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
         Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => EventDetailsPage(
-              imageUrl: item.image,
-              eventName: item.title,
-              eventTime: item.date,
-            ),
-          ),
+          MaterialPageRoute(builder: (_) => EventDetailsPage(eventModel: item)),
         );
       },
       child: Container(
@@ -200,8 +202,8 @@ class _EventCard extends StatelessWidget {
               child: SizedBox(
                 height: 100,
                 width: 80,
-                child: CachedNetworkImage(
-                  imageUrl: item.image,
+                child: Image.asset(
+                  "assets/icons/Event_Images/${item.image}",
                   fit: BoxFit.cover,
                 ),
               ),
@@ -221,7 +223,7 @@ class _EventCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    item.title,
+                    item.name,
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                     style: CustomStyle.twenty.copyWith(
@@ -237,47 +239,6 @@ class _EventCard extends StatelessWidget {
       ),
     );
   }
-}
-
-// class _FilterButton extends StatelessWidget {
-//   const _FilterButton({required this.onPressed});
-
-//   final VoidCallback onPressed;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return InkWell(
-//       onTap: onPressed,
-//       child: Container(
-//         height: kToolbarHeight,
-//         decoration: BoxDecoration(
-//           color: primaryGreen,
-//           borderRadius: BorderRadius.circular(10),
-//         ),
-//         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-//         child: Row(
-//           children: [
-//             const Icon(Icons.filter_alt, color: Colors.white, size: 20),
-//             const SizedBox(width: 6),
-//             Text(
-//               'Filters',
-//               style: CustomStyle.fourteenWhite.copyWith(
-//                 fontWeight: FontWeight.w600,
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-class _EventItem {
-  _EventItem({required this.title, required this.date, required this.image});
-
-  final String title;
-  final String date;
-  final String image;
 }
 
 class _SegmentedTabs extends StatelessWidget {

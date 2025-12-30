@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:green_globe/src/const/custom_style.dart';
 import 'package:green_globe/src/presentations/views/menu/menu_page.dart';
+import 'package:green_globe/src/presentations/views/menu/noti/noti_page.dart';
 import 'package:iconsax/iconsax.dart';
 
 PreferredSizeWidget customAppBar(BuildContext context) {
@@ -41,27 +42,27 @@ PreferredSizeWidget customAppBar(BuildContext context) {
         }
       },
     ),
-    title: Text(
-      'GreenGlobe',
-      style: CustomStyle.sixteen.copyWith(
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
-      ),
+    // title: Text(
+    //   'GreenGlobe',
+    //   style: CustomStyle.sixteen.copyWith(
+    //     fontSize: 20,
+    //     fontWeight: FontWeight.bold,
+    //   ),
+    // ),
+    title: Center(
+      child: Image.asset("assets/icons/text_logo_green.png", height: 20),
     ),
     centerTitle: true,
     actions: [
       IconButton(
         icon: Icon(Icons.notifications),
         onPressed: () {
-          // Navigator.of(
-          //   context,
-          // ).push(MaterialPageRoute(builder: (_) => SignIn()));
-          // // Add notification action here
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => NotificationPage()));
+          // Add notification action here
         },
       ),
     ],
-    backgroundColor: Colors.transparent,
-    // elevation: 2,
-    foregroundColor: Colors.black,
   );
 }

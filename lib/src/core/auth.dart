@@ -1,10 +1,31 @@
 import 'dart:math';
 import 'package:green_globe/src/const/constant.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 /// Authentication service for handling user sign in, sign out, and password reset
 class AuthService {
   static SupabaseClient get _client => Supabase.instance.client;
+
+  static Future getUsers(String email) async {
+    try {
+      final session = _client.auth.currentSession;
+      final currentEmail = session?.user.email;
+
+      if (currentEmail == null) {
+        throw AuthException('Not signed in or email claim missing in JWT.');
+      }
+
+      final res = await _client
+          .from('users')
+          .select()
+          .eq('email', currentEmail)
+          .maybeSingle();
+      return res;
+    } catch (e) {
+      throw Exception('Failed to fetch user: $e');
+    }
+  }
 
   static Future<AuthResponse> signIn({
     required String email,
@@ -27,18 +48,19 @@ class AuthService {
     required String email,
     required String password,
     Map<String, dynamic>? data,
-    String? emailRedirectTo,
   }) async {
     try {
+      final redirect = 'greenglobe://auth';
+
       final response = await _client.auth.signUp(
         email: email.trim(),
         password: password,
         data: data,
-        emailRedirectTo: emailRedirectTo,
+        emailRedirectTo: redirect,
       );
 
       if (response.user != null) {
-        final userId = response.user!.id;
+        final userId = response.user?.id;
         final userEmail = email.trim();
 
         // Get random profile picture URL
@@ -47,17 +69,23 @@ class AuthService {
             profilePictureUrls[random.nextInt(profilePictureUrls.length)];
 
         try {
-          // Insert into users table
           await _client.from('users').insert({
-            'user_id': userId,
+            'user_id': userId ?? Uuid().v4().toLowerCase(),
             'email': userEmail,
             'profile_picture_url': randomProfilePictureUrl,
             'points': 0,
             'points_history': [],
           });
+
+          try {
+            await _client.auth.resend(
+              type: OtpType.email,
+              email: userEmail,
+              emailRedirectTo: redirect,
+            );
+          } catch (_) {}
         } on PostgrestException catch (e) {
-          // Clean up the user on Supabase Auth if user record insertion failed
-          await _client.auth.admin.deleteUser(userId);
+          await _client.auth.admin.deleteUser(userId!);
           throw Exception('Failed to create user record: ${e.message}');
         }
       }
@@ -114,9 +142,12 @@ class AuthService {
     }
   }
 
-  
-  static Future<void> deleteAccount({String? password}) async {
+  static Future<void> deleteAccountViaEdgeFunction(String? password) async {
     try {
+      final session = _client.auth.currentSession;
+      if (session == null) {
+        throw AuthException('User is not signed in.');
+      }
       final user = _client.auth.currentUser;
       if (user == null) {
         throw AuthException('User is not signed in.');
@@ -130,8 +161,23 @@ class AuthService {
         );
       }
 
-      
-      await _client.auth.admin.deleteUser(user.id);
+      final accessToken = session.accessToken;
+      if (accessToken.isEmpty) {
+        throw AuthException('No access token available for current session.');
+      }
+
+      try {
+        await _client.functions.invoke('del', body: {"user_id": user.id});
+        await _client.from("users").delete().eq("email", user.email!);
+        await _client
+            .from("reports_admin")
+            .delete()
+            .eq("reporter", user.email!);
+        await signOut();
+      } catch (e) {
+        // print(e.toString());
+        throw e.toString();
+      }
     } on AuthException catch (e) {
       throw AuthException(e.message, statusCode: e.statusCode);
     } catch (e) {
@@ -141,19 +187,28 @@ class AuthService {
     }
   }
 
-  static Future<void> forgotPassword({
-    required String email,
-    String? redirectTo,
-  }) async {
+  static Future<void> forgotPassword({required String email}) async {
     try {
       await _client.auth.resetPasswordForEmail(
         email.trim(),
-        redirectTo: redirectTo,
+        redirectTo: 'greenglobe://auth',
       );
     } on AuthException catch (e) {
       throw AuthException(e.message, statusCode: e.statusCode);
     } catch (e) {
       throw Exception('An unexpected error occurred: $e');
+    }
+  }
+
+  static Future<void> updatePassword({required String password}) async {
+    try {
+      await _client.auth.updateUser(UserAttributes(password: password));
+    } on AuthException catch (e) {
+      throw AuthException(e.message, statusCode: e.statusCode);
+    } catch (e) {
+      throw Exception(
+        'An unexpected error occurred while updating password: $e',
+      );
     }
   }
 

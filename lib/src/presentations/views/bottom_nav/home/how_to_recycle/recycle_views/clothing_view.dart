@@ -26,7 +26,7 @@ class ClothingRecycleMethodDetailsView extends StatelessWidget {
             SizedBox(height: 10),
             ImageBuilder(
               context: context,
-              image: 'assets/icons/plastics1.jpeg',
+              image: 'assets/icons/Cloth Recycling/cloth.png',
               text:
                   "#1 (PET) & #2 (HDPE) bottles are often accepted; remove caps.",
             ),

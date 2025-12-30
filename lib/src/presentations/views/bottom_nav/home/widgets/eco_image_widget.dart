@@ -28,13 +28,12 @@ class EcoImageBuilder extends StatelessWidget {
         children: [
           // Background Image
           Positioned(
-            bottom: 0,
+            // bottom: 0,
             left: 0,
             child: Image.asset(
               image,
-              // fit: BoxFit.cover,
-              width: 180,
-              height: 200,
+              width: 150,
+              height: 150,
               errorBuilder: (context, error, stackTrace) => Container(
                 color: Colors.grey[300],
                 child: const Center(
@@ -46,30 +45,23 @@ class EcoImageBuilder extends StatelessWidget {
           // Caption Text
           Positioned(
             right: 0,
-            top: 10,
+            top: 20,
             child: Container(
               padding: const EdgeInsets.symmetric(
                 horizontal: 10.0,
                 vertical: 8.0,
               ),
 
-              child: Column(
-                children: [
-                  Text(
-                    text,
-                    style: CustomStyle.twenty.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  // Text(
-                  //   shortDesc,
-                  //   style: CustomStyle.sixteen,
-                  //   maxLines: 20,
-                  //   overflow: TextOverflow.ellipsis,
-                  // ),
-                ],
+              child: Text(
+                text.toUpperCase(),
+                style: CustomStyle.twelve.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                  color: primaryGreen,
+                ),
+                // maxLines: 3,
+                textAlign: TextAlign.end,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ),

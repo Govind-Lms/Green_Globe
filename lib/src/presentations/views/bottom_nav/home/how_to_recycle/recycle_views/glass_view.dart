@@ -13,11 +13,13 @@ class GlassRecycleMethodDetailsView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         title: Text(
           'Glass Recycling',
           style: CustomStyle.twenty.copyWith(fontWeight: FontWeight.bold),
         ),
       ),
+      backgroundColor: accentGreen,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -26,7 +28,7 @@ class GlassRecycleMethodDetailsView extends StatelessWidget {
             SizedBox(height: 10),
             ImageBuilder(
               context: context,
-              image: 'assets/icons/plastics1.jpeg',
+              image: 'assets/icons/Glass Recycling/glass1.jpg',
               text: "Bottles and jars (check local rules for colors).",
             ),
             TitleBuilder(title: "Step-by-Step: How Glass Is Recycled"),
@@ -42,7 +44,11 @@ class GlassRecycleMethodDetailsView extends StatelessWidget {
               color: primaryGreen,
             ),
             SizedBox(height: 10),
-            ImageBuilder(context: context, image: "assets/", text: ''),
+            ImageBuilder(
+              context: context,
+              image: 'assets/icons/Glass Recycling/glass2.jpg',
+              text: '',
+            ),
             TitleBuilder(title: "Why to Recycle Glass"),
             Text(
               "Before diving into the steps, here’s why glass recycling matters:",

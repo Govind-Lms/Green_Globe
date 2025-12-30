@@ -26,7 +26,7 @@ class EcoTransportDetailsView extends StatelessWidget {
             SizedBox(height: 10),
             EcoImageBuilder(
               image: ecoModel.image,
-              text: ecoModel.title,
+              text: ecoModel.newtitle,
               shortDesc: ecoModel.shortDesc,
             ),
 

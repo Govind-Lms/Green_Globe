@@ -13,6 +13,11 @@ class BottomNav extends StatefulWidget {
 }
 
 class _BottomNavState extends State<BottomNav> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   final List<Widget> _pages = [HomePage(), Account()];
   int _selectedIndex = 0;
   @override
@@ -76,7 +81,7 @@ class _BottomNavState extends State<BottomNav> {
               });
             },
             selectedItemColor: Colors.white,
-            unselectedItemColor: Colors.blueGrey,
+            unselectedItemColor: secondaryGreen,
             items: const [
               BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
               BottomNavigationBarItem(

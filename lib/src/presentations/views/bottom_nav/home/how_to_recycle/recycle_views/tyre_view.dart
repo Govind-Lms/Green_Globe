@@ -25,7 +25,7 @@ class TyreRecycleMethodDetailsView extends StatelessWidget {
             SizedBox(height: 10),
             ImageBuilder(
               context: context,
-              image: "assets/icons/plastics1.jpeg",
+              image: "assets/icons/Tyre Recycling/tire1.jpeg",
               text:
                   "A tyre is made up of rubber, steel, textiles and other elements that reinforce the resistance of rubber.",
             ),

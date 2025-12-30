@@ -26,7 +26,7 @@ class EwasteRecycleMethodDetailsView extends StatelessWidget {
             SizedBox(height: 10),
             ImageBuilder(
               context: context,
-              image: 'assets/icons/plastics1.jpeg',
+              image: 'assets/icons/E-Waste Recycling/ewaste.jpg',
               text:
                   "E-waste, or electronic waste, refers to discarded electrical or electronic items like phones, computers, and appliances, containing valuable materials but also hazardous substances (lead, mercury) that harm health and the environment if not managed properly.",
             ),
@@ -144,7 +144,7 @@ class EwasteRecycleMethodDetailsView extends StatelessWidget {
             ),
             SizedBox(height: 10),
             ImageBuilder(
-              image: "assets/icons/plastics2.png",
+              image: "assets/icons/E-Waste Recycling/ewaste2.png",
               context: context,
               text: '',
             ),
