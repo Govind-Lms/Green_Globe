@@ -1,9 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:green_globe/src/const/constant.dart';
 import 'package:green_globe/src/const/custom_style.dart';
 import 'package:green_globe/src/core/auth.dart';
+import 'package:green_globe/src/models/calculator_model.dart';
 import 'package:green_globe/src/models/category_model.dart';
 import 'package:green_globe/src/models/eco_model.dart';
+import 'package:green_globe/src/presentations/views/bottom_nav/home/calculators/all_calculators.dart';
+import 'package:green_globe/src/presentations/views/bottom_nav/home/calculators/calculations/bottle_calculator.dart';
+import 'package:green_globe/src/presentations/views/bottom_nav/home/calculators/calculations/carbon_reduction_calculator.dart';
+import 'package:green_globe/src/presentations/views/bottom_nav/home/calculators/calculations/cardbaord_calculator.dart';
+import 'package:green_globe/src/presentations/views/bottom_nav/home/calculators/calculations/e_waste_calculator.dart';
+import 'package:green_globe/src/presentations/views/bottom_nav/home/calculators/calculations/metal_calculator.dart';
+import 'package:green_globe/src/presentations/views/bottom_nav/home/calculators/calculations/plastic_calculator.dart';
+import 'package:green_globe/src/presentations/views/bottom_nav/home/calculators/calculations/scrap_value_calculator.dart';
+import 'package:green_globe/src/presentations/views/bottom_nav/home/calculators/calculations/waste_generation_calculator.dart';
+import 'package:green_globe/src/presentations/views/bottom_nav/home/calculators/calculations/waste_impact_calculator.dart';
 import 'package:green_globe/src/presentations/views/bottom_nav/home/eco_friendly_tips/eco_friendly_view.dart';
 import 'package:green_globe/src/presentations/views/bottom_nav/home/eco_friendly_tips/eco_views/eco_product.dart';
 import 'package:green_globe/src/presentations/views/bottom_nav/home/eco_friendly_tips/eco_views/eco_transport.dart';
@@ -79,13 +91,12 @@ class _HomePageState extends State<HomePage> {
       debugPrint('Error in _fetchUserStats: $e\n$stackTrace');
       // Don't show snackbar if context is not mounted
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(
-              'Failed to fetch user stats. Please try again.',
-            ),
-            backgroundColor: Colors.red[400],
-          ),
+        Fluttertoast.showToast(
+          msg: 'Failed to fetch user stats.',
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.red[400],
+          textColor: Colors.white,
         );
       }
       return <String, dynamic>{
@@ -109,6 +120,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: customAppBar(context),
+      backgroundColor: Colors.white,
       body: RefreshIndicator(
         onRefresh: () async {
           _refreshStat();
@@ -126,7 +138,77 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     const SizedBox(height: 12),
                     _PointsCard(_userStatsFuture),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 12),
+                    _SectionHeader(
+                      title: 'Calculators',
+                      onSeeAll: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => AllCalculatorsPage(),
+                          ),
+                        );
+                      },
+                    ),
+                    SizedBox(
+                      height: 120,
+
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: calculators.length,
+                        itemBuilder: (context, index) {
+                          final calculator = calculators[index];
+                          return InkWell(
+                            onTap: () {
+                              final pages = [
+                                CarbonReductionCalculatorPage(),
+                                WasteGenerationCalculator(),
+                                ScrapRecyclingValueCalculator(),
+                                MetalRecyclingCalculatorView(),
+                                PlasticRecyclingCalculatorView(),
+                                BottlesRecyclingCalculatorView(),
+                                CardboardRecyclingCalculatorView(),
+                                EWasteRecyclingCalculatorView(),
+                                WasteImpactCalculator(),
+                              ];
+
+                              if (index < pages.length) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => pages[index],
+                                  ),
+                                );
+                              }
+                            },
+                            child: Container(
+                              margin: const EdgeInsets.all(10),
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: primaryGreen,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(calculator.icon, color: Colors.white),
+                                  SizedBox(height: 10),
+                                  Flexible(
+                                    child: Text(
+                                      calculator.name,
+                                      style: CustomStyle.fourteenWhite,
+                                      textAlign: TextAlign.left,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 12),
                     _SectionHeader(
                       title: 'HOW TO RECYCLE?',
                       onSeeAll: () {
@@ -258,6 +340,7 @@ class _PointsCard extends StatefulWidget {
 
 class _PointsCardState extends State<_PointsCard> {
   bool _pointsVisible = true;
+  Map<String, dynamic>? userStatsFuture;
 
   @override
   Widget build(BuildContext context) {
@@ -298,6 +381,7 @@ class _PointsCardState extends State<_PointsCard> {
                       }
                     }
                   }
+
                   return Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -655,7 +739,7 @@ class _RecycleCategories extends StatelessWidget {
                   const SizedBox(height: 12),
                   Text(
                     recycleLists[index].title,
-                    style: CustomStyle.sixteen.copyWith(
+                    style: CustomStyle.fourteen.copyWith(
                       fontWeight: FontWeight.w700,
                       color: Colors.black87,
                     ),

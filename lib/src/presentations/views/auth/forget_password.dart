@@ -167,7 +167,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
               ),
               const SizedBox(height: 40),
 
-              // SEND button
+             
               SizedBox(
                 width: double.infinity,
                 height: kToolbarHeight,

@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:green_globe/src/const/constant.dart';
 import 'package:green_globe/src/const/custom_style.dart';
 import 'package:green_globe/src/core/auth.dart';
@@ -8,6 +9,7 @@ import 'package:green_globe/src/presentations/views/bottom_nav/account/about_pag
 import 'package:green_globe/src/presentations/views/bottom_nav/nav.dart';
 import 'package:green_globe/src/presentations/views/menu/noti/noti_page.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:lottie/lottie.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Account extends StatefulWidget {
@@ -21,6 +23,7 @@ class _AccountState extends State<Account> {
   Map<String, dynamic>? _userData;
   bool _isLoading = true;
   bool _checkedAuth = false;
+  bool _hasInternet = true;
 
   int get _binsNotified {
     if (_userData != null && _userData!['points_history'] != null) {
@@ -60,6 +63,7 @@ class _AccountState extends State<Account> {
   Future<void> _fetchUserData() async {
     setState(() {
       _isLoading = true;
+      _hasInternet = true;
     });
     try {
       final user = AuthService.getCurrentUser();
@@ -79,9 +83,11 @@ class _AccountState extends State<Account> {
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } on Exception {
+      // Basic internet error handling
       setState(() {
         _isLoading = false;
+        _hasInternet = false;
       });
     }
   }
@@ -124,28 +130,205 @@ class _AccountState extends State<Account> {
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error logging out: $e'),
-              backgroundColor: Colors.red,
-            ),
+          Fluttertoast.showToast(
+            msg: 'Error logging out: $e',
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
           );
         }
       }
     }
   }
 
+  Widget _buildProfileShimmer() {
+    return Scaffold(
+      appBar: AppBar(
+        title: Container(width: 100, height: 24, color: Colors.grey.shade300),
+        centerTitle: false,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.notifications, color: Colors.grey.shade300),
+            onPressed: null,
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: Column(
+          children: [
+            const SizedBox(height: 16),
+            // Profile Picture and Name shimmer
+            Column(
+              children: [
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(width: 120, height: 22, color: Colors.grey.shade300),
+                const SizedBox(height: 20),
+                // Level and Points shimmer
+                Row(
+                  children: [
+                    Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Container(
+                      width: 80,
+                      height: 18,
+                      color: Colors.grey.shade300,
+                    ),
+                    Spacer(),
+                    Container(
+                      width: 110,
+                      height: 18,
+                      color: Colors.grey.shade300,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 32),
+            // Info Cards shimmer
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    height: 64,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Container(
+                    height: 64,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 32),
+            // Settings Section shimmer
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Container(
+                width: 80,
+                height: 18,
+                color: Colors.grey.shade300,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              height: 48,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              margin: const EdgeInsets.only(bottom: 12),
+            ),
+            Container(
+              height: 48,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = AuthService.getCurrentUser();
+
     if (!_checkedAuth && !_isLoading) {
       return const SignIn();
     }
+
     if (_isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return _buildProfileShimmer();
     }
+
+    if (!_hasInternet) {
+      return Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                height: 220,
+                child: Lottie.asset(
+                  'assets/lotties/no_internet.json',
+                  fit: BoxFit.contain,
+                  repeat: true,
+                  errorBuilder: (context, error, stackTrace) => Icon(
+                    Icons.wifi_off,
+                    size: 100,
+                    color: Colors.grey.shade400,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Oops! Please Try Again!',
+                textAlign: TextAlign.center,
+                style: CustomStyle.twenty.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black.withOpacity(0.8),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                "The internet connection appears to be offline.",
+                textAlign: TextAlign.center,
+                style: CustomStyle.fourteen.copyWith(
+                  color: Colors.grey.shade600,
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextButton(
+                onPressed: () async {
+                  await _fetchUserData();
+                },
+                child: Text(
+                  "Retry",
+                  style: CustomStyle.twelve.copyWith(color: primaryGreen),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     if (user == null) {
-      return const SizedBox.shrink();
+      return const SignIn();
     }
 
     final points = _userData?['points'] as int? ?? 0;
@@ -168,9 +351,6 @@ class _AccountState extends State<Account> {
           'Profile',
           style: CustomStyle.twenty.copyWith(fontWeight: FontWeight.bold),
         ),
-        centerTitle: false,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
         actions: [
           IconButton(
             icon: Icon(Icons.notifications),
@@ -196,6 +376,8 @@ class _AccountState extends State<Account> {
                   backgroundImage: CachedNetworkImageProvider(
                     profilePictureUrl,
                   ),
+                  backgroundColor: Colors.grey[200],
+                  onBackgroundImageError: (obj, err) {},
                 ),
                 const SizedBox(height: 16),
                 Text(

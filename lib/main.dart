@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:green_globe/src/const/constant.dart';
 import 'package:green_globe/src/core/supabase_config.dart';
 import 'package:green_globe/src/presentations/views/auth/reset_password_page.dart';
-import 'package:green_globe/src/presentations/views/splash/splash_page.dart';
+import 'package:green_globe/src/presentations/views/bottom_nav/nav.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
@@ -48,13 +48,13 @@ class _MyAppState extends State<MyApp> {
             MaterialPageRoute(builder: (_) => ResetPasswordPage()),
           );
         } else if (event == AuthChangeEvent.signedIn) {
-          _scaffoldMessengerKey.currentState?.showSnackBar(
-            const SnackBar(content: Text('Signed in using deep link')),
-          );
+          // _scaffoldMessengerKey.currentState?.showSnackBar(
+          //   const SnackBar(content: Text('Signed in using deep link')),
+          // );
         } else if (event == AuthChangeEvent.tokenRefreshed) {}
       },
       onError: (err) {
-        print('Supabase deep link error: $err');
+        debugPrint('Supabase deep link error: $err');
       },
     );
   }
@@ -74,7 +74,7 @@ class _MyAppState extends State<MyApp> {
         ),
         scaffoldBackgroundColor: accentGreen,
       ),
-      home: SplashPage(),
+      home: BottomNav(),
     );
   }
 

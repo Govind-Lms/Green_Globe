@@ -24,6 +24,7 @@ class PlantATreeDetailsView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 10),
+
             EcoImageBuilder(
               image: ecoModel.image,
               text: ecoModel.newtitle,

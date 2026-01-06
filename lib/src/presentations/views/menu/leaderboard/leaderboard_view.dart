@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:green_globe/src/const/constant.dart';
 import 'package:green_globe/src/const/custom_style.dart';
 import 'package:green_globe/src/presentations/views/menu/leaderboard/rank_widget.dart';
+import 'package:lottie/lottie.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LeaderboardView extends StatefulWidget {
@@ -52,6 +54,158 @@ class _LeaderboardViewState extends State<LeaderboardView> {
     }
   }
 
+  // --- Begin Shimmer Code ---
+  Widget _buildShimmerItem() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 0),
+      child: Row(
+        children: [
+          Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(26),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  height: 18,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  height: 14,
+                  width: 80,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 16),
+          Container(
+            height: 18,
+            width: 38,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLeaderboardShimmer() {
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      itemCount: 5,
+      separatorBuilder: (_, __) => const SizedBox(height: 8),
+      itemBuilder: (_, index) {
+        if (index == 0) {
+          // Simulate shimmer for the top 3
+          return SizedBox(
+            height: 175,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Positioned(
+                  left: 10,
+                  bottom: 0,
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 68,
+                        height: 68,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        width: 60,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        width: 70,
+                        height: 14,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  right: 10,
+                  bottom: 0,
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 68,
+                        height: 68,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        width: 60,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        } else if (index == 1 || index == 2) {
+          return const SizedBox.shrink();
+        }
+        return _buildShimmerItem();
+      },
+    );
+  }
+  // --- End Shimmer Code ---
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,9 +221,65 @@ class _LeaderboardViewState extends State<LeaderboardView> {
         children: [
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? _buildLeaderboardShimmer()
                 : _error != null
-                ? Center(child: Text('Error: ${_error!}'))
+                ? Center(
+                    child: Center(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        physics: const BouncingScrollPhysics(),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              height: 220,
+                              child: Lottie.asset(
+                                'assets/lotties/no_internet.json',
+                                fit: BoxFit.contain,
+                                repeat: true,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Icon(
+                                      Icons.notifications_none,
+                                      size: 100,
+                                      color: Colors.grey.shade400,
+                                    ),
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            Text(
+                              'Oops! Please Try Again!',
+                              textAlign: TextAlign.center,
+                              style: CustomStyle.twenty.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black.withOpacity(0.8),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              "The internet connection appears to be offline.",
+                              textAlign: TextAlign.center,
+                              style: CustomStyle.fourteen.copyWith(
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            TextButton(
+                              onPressed: () async {
+                                await _fetchLeaderboard();
+                              },
+                              child: Text(
+                                "Retry",
+                                style: CustomStyle.twelve.copyWith(
+                                  color: primaryGreen,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
                 : _items.isEmpty
                 ? const Center(child: Text('No leaderboard entries'))
                 : ListView.separated(

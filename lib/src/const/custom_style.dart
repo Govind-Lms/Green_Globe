@@ -48,4 +48,9 @@ class CustomStyle {
     fontWeight: FontWeight.normal,
     color: Colors.white,
   );
+  static TextStyle twentyWhite = GoogleFonts.poppins().copyWith(
+    fontSize: 20.0,
+    fontWeight: FontWeight.normal,
+    color: Colors.white,
+  );
 }

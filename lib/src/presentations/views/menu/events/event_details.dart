@@ -80,23 +80,13 @@ class EventDetailsPage extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 10),
-                          Text.rich(
-                            TextSpan(
-                              text: eventModel.description,
-                              style: CustomStyle.fourteen.copyWith(
-                                height: 1.5,
-                                color: Colors.black87,
-                              ),
-                              children: [
-                                TextSpan(
-                                  text: 'Read More...',
-                                  style: CustomStyle.fourteen.copyWith(
-                                    color: primaryGreen,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
+                          Text(
+                            eventModel.description,
+                            style: CustomStyle.fourteen.copyWith(
+                              height: 1.5,
+                              color: Colors.black87,
                             ),
+                            textAlign: TextAlign.justify,
                           ),
                           const SizedBox(height: 32),
                         ],

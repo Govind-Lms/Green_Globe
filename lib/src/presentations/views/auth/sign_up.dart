@@ -22,6 +22,9 @@ class _SignUpState extends State<SignUp> {
 
   bool _isLoading = false;
 
+  bool _showNewPassword = false;
+  String? _passwordError;
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -103,6 +106,7 @@ class _SignUpState extends State<SignUp> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -155,20 +159,136 @@ class _SignUpState extends State<SignUp> {
               const SizedBox(height: 16),
 
               // Password field
-              _buildTextField(
+              TextField(
                 controller: _passwordController,
-                hint: 'Your password',
-                icon: Iconsax.lock,
-                obscureText: true,
-                suffixIcon: Icons.visibility_outlined,
+                obscureText: !_showNewPassword,
+                onChanged: (val) {
+                  setState(() {
+                    if (val.length < 8) {
+                      _passwordError =
+                          'Password must be at least 8 characters long';
+                    } else {
+                      _passwordError = null;
+                    }
+                  });
+                },
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(
+                    Iconsax.lock,
+                    color: Color(0xFFB0B0B0),
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _showNewPassword
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _showNewPassword = !_showNewPassword;
+                      });
+                    },
+                  ),
+                  hintText: 'New Password',
+                  hintStyle: CustomStyle.fourteen.copyWith(
+                    color: const Color(0xFFB0B0B0),
+                  ),
+                  errorText: _passwordError,
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 18,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(
+                      color: Color(0xFFE5E5E5),
+                      width: 1,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(
+                      color: primaryGreen,
+                      width: 1.4,
+                    ),
+                  ),
+                ),
+                // decoration: InputDecoration(
+                //   labelText: "New Password",
+
+                //   errorText: _passwordError,
+                //   border: OutlineInputBorder(
+                //     borderRadius: BorderRadius.circular(12),
+                //   ),
+                // ),
               ),
-              const SizedBox(height: 16),
-              _buildTextField(
+              SizedBox(height: 16),
+              TextField(
                 controller: _confirmPasswordController,
-                hint: 'Confirm password',
-                icon: Iconsax.lock,
-                obscureText: true,
-                suffixIcon: Icons.visibility_outlined,
+                obscureText: !_showNewPassword,
+                onChanged: (val) {
+                  setState(() {
+                    if (val.length < 8) {
+                      _passwordError =
+                          'Password must be at least 8 characters long';
+                    } else {
+                      _passwordError = null;
+                    }
+                  });
+                },
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(
+                    Iconsax.lock,
+                    color: Color(0xFFB0B0B0),
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _showNewPassword
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _showNewPassword = !_showNewPassword;
+                      });
+                    },
+                  ),
+                  hintText: 'New Password',
+                  hintStyle: CustomStyle.fourteen.copyWith(
+                    color: const Color(0xFFB0B0B0),
+                  ),
+                  errorText: _passwordError,
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 18,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(
+                      color: Color(0xFFE5E5E5),
+                      width: 1,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(
+                      color: primaryGreen,
+                      width: 1.4,
+                    ),
+                  ),
+                ),
+                // decoration: InputDecoration(
+                //   labelText: "New Password",
+
+                //   errorText: _passwordError,
+                //   border: OutlineInputBorder(
+                //     borderRadius: BorderRadius.circular(12),
+                //   ),
+                // ),
               ),
               const SizedBox(height: 16),
 
@@ -254,9 +374,7 @@ class _SignUpState extends State<SignUp> {
                       ),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(builder: (_) => SignIn()),
-                          );
+                          Navigator.of(context).pop();
                         },
                     ),
                   ],

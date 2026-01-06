@@ -195,7 +195,7 @@ class _QRScanPageState extends State<QRScanPage> {
               child: const Center(child: CircularProgressIndicator()),
             ),
           Align(
-            alignment: Alignment.topCenter,
+            alignment: Alignment.bottomCenter,
             child: Padding(
               padding: const EdgeInsets.all(24.0),
               child: Text(

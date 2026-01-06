@@ -2,7 +2,6 @@ class BinModel {
   final String title;
   final String caption;
   final String image;
-
   BinModel({required this.title, required this.caption, required this.image});
 }
 
